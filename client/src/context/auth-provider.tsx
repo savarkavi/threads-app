@@ -11,6 +11,8 @@ type UserObject = {
   username: string;
   email: string;
   id: string;
+  bio: string;
+  profilePic: string;
 };
 
 const AuthContext = createContext<ContextTypes | null>(null);

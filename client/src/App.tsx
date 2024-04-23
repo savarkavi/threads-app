@@ -14,14 +14,19 @@ function App() {
 
   return (
     <div
-      className={`w-full min-h-screen ${
+      className={`w-full min-h-screen px-6 ${
         theme === "dark" ? "dark bg-zinc-950" : "bg-white"
       }`}
     >
-      <div className="max-w-[768px] mx-auto px-6 bg-white dark:bg-zinc-950">
+      <div className="max-w-[768px] mx-auto bg-white dark:bg-zinc-950">
         <Header />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/"
+            element={
+              currentUser ? <HomePage /> : <Navigate to="/auth/signin" />
+            }
+          />
           <Route
             path="/auth/signup"
             element={!currentUser ? <SignUp /> : <Navigate to="/" />}
@@ -30,8 +35,18 @@ function App() {
             path="/auth/signin"
             element={!currentUser ? <SignIn /> : <Navigate to="/" />}
           />
-          <Route path="/:username" element={<UserPage />} />
-          <Route path="/:username/post/:postId" element={<UserPostPage />} />
+          <Route
+            path="/:username"
+            element={
+              currentUser ? <UserPage /> : <Navigate to="/auth/signin" />
+            }
+          />
+          <Route
+            path="/:username/post/:postId"
+            element={
+              currentUser ? <UserPostPage /> : <Navigate to="/auth/signin" />
+            }
+          />
         </Routes>
       </div>
     </div>

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type FormData = {
   username: string;
@@ -15,7 +16,7 @@ const SignIn = () => {
     password: "",
   });
 
-  const navigate = useNavigate();
+  const { setCurrentUser } = useAuthContext();
 
   const handleFormSubmission = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +35,8 @@ const SignIn = () => {
       });
       toast.success(`Welcome ${data.fullname}`);
       localStorage.setItem("currentUser", JSON.stringify(data));
-      navigate("/");
+
+      setCurrentUser(data);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -45,7 +47,7 @@ const SignIn = () => {
     <div className="flex flex-col items-center gap-8">
       <h1 className="text-3xl sm:text-4xl font-semibold">Sign In</h1>
       <form
-        className="bg-zinc-900 rounded-xl w-full mx-auto flex"
+        className="bg-gray-200 dark:bg-zinc-900 shadow-2xl rounded-xl w-full mx-auto flex"
         onSubmit={handleFormSubmission}
       >
         <div className="w-full flex-[50%] hidden sm:block">
@@ -61,7 +63,7 @@ const SignIn = () => {
             </label>
             <input
               id="username"
-              className="border border-white bg-transparent rounded-lg p-3 w-full"
+              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.username}
               onChange={(e) =>
                 setInputs({ ...inputs, username: e.target.value })
@@ -76,7 +78,7 @@ const SignIn = () => {
             <input
               id="password"
               type="password"
-              className="border border-white bg-transparent rounded-lg p-3 w-full"
+              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.password}
               onChange={(e) =>
                 setInputs({ ...inputs, password: e.target.value })
@@ -84,7 +86,7 @@ const SignIn = () => {
             />
           </div>
 
-          <button className="p-3 rounded-lg bg-blue-500 mt-4">Sign Up</button>
+          <button className="p-3 rounded-lg bg-blue-500 mt-4">Sign In</button>
           <div className="mt-4 flex gap-2 self-center">
             <p>New user?</p>
             <Link to="/auth/signup" className="text-blue-500">

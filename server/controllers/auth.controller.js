@@ -43,6 +43,7 @@ export const signup = async (req, res) => {
       fullname: newUser.fullname,
       username: newUser.username,
       email: newUser.email,
+      bio: newUser.bio,
     });
   } catch (error) {
     console.log(error.message);
@@ -72,6 +73,7 @@ export const signin = async (req, res) => {
       fullname: user.fullname,
       username: user.username,
       email: user.email,
+      bio: user.bio,
     });
   } catch (error) {
     console.log(error.message);

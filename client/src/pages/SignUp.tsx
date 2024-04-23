@@ -40,7 +40,7 @@ const SignUp = () => {
       });
 
       localStorage.setItem("currentUser", JSON.stringify(data));
-      toast.success("Account successfully created. Please Sign In");
+      toast.success("Account successfully created.");
       navigate("/auth/signin");
     } catch (error: any) {
       console.log(error);
@@ -52,7 +52,7 @@ const SignUp = () => {
     <div className="flex flex-col items-center gap-8">
       <h1 className="text-3xl sm:text-4xl font-semibold">Sign Up</h1>
       <form
-        className="bg-zinc-900 rounded-xl w-full mx-auto flex"
+        className="bg-gray-200 dark:bg-zinc-900 shadow-2xl rounded-xl w-full mx-auto flex"
         onSubmit={handleFormSubmission}
       >
         <div className="w-full flex-[50%] hidden sm:block">
@@ -68,7 +68,7 @@ const SignUp = () => {
             </label>
             <input
               id="fullname"
-              className="border border-white bg-transparent rounded-lg p-3 w-full"
+              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.fullname}
               onChange={(e) =>
                 setInputs({ ...inputs, fullname: e.target.value })
@@ -82,7 +82,7 @@ const SignUp = () => {
             </label>
             <input
               id="username"
-              className="border border-white bg-transparent rounded-lg p-3 w-full"
+              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.username}
               onChange={(e) =>
                 setInputs({ ...inputs, username: e.target.value })
@@ -97,7 +97,7 @@ const SignUp = () => {
             <input
               id="email"
               type="email"
-              className="border border-white bg-transparent rounded-lg p-3 w-full"
+              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.email}
               onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
             />
@@ -110,7 +110,7 @@ const SignUp = () => {
             <input
               id="password"
               type="password"
-              className="border border-white bg-transparent rounded-lg p-3 w-full"
+              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.password}
               onChange={(e) =>
                 setInputs({ ...inputs, password: e.target.value })

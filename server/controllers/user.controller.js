@@ -1,5 +1,4 @@
 import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
 
 export const followUser = async (req, res) => {
   try {
@@ -35,7 +34,7 @@ export const followUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { fullname, username, email, password, profilePic, bio } = req.body;
+    const { fullname, username, profilePic, bio } = req.body;
 
     const userId = req.user._id;
 
@@ -44,17 +43,10 @@ export const updateUser = async (req, res) => {
         .status(400)
         .json({ message: "You cannot update other user's profile." });
 
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      user.password = hashedPassword;
-    }
-
     const user = await User.findByIdAndUpdate(userId);
 
     user.fullname = fullname || user.fullname;
     user.username = username || user.username;
-    user.email = email || user.email;
     user.profilePic = profilePic || user.profilePic;
     user.bio = bio || user.bio;
 
