@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 type FormData = {
   fullname: string;
@@ -18,8 +19,11 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+  const { currentUser } = useAuthContext();
 
-  const navigate = useNavigate();
+  if (currentUser) {
+    return <Navigate to="/" />;
+  }
 
   const handleFormSubmission = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,7 +45,6 @@ const SignUp = () => {
 
       localStorage.setItem("currentUser", JSON.stringify(data));
       toast.success("Account successfully created.");
-      navigate("/auth/signin");
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);

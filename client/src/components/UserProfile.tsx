@@ -21,41 +21,62 @@ import {
 import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
 
 const UserProfile = () => {
   const { currentUser, setCurrentUser } = useAuthContext();
-  const [isImageSelected, setImageSelected] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  if (!currentUser) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  if (!currentUser || currentUser === "loading") {
     return null;
   }
 
   const handleLogout = async () => {
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-    await axios.post("/api/auth/signout");
-    toast.success("You have been logged out");
+    try {
+      await axios.post("/api/auth/signout");
+      localStorage.removeItem("currentUser");
+      setCurrentUser(null);
+      toast.success("You have been logged out");
+      navigate("/auth/signin");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
   };
 
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("fullname", currentUser.fullname);
+      formData.append("username", currentUser.username);
+      formData.append("bio", currentUser.bio);
+
+      if (imageFile) {
+        formData.append("profilePic", imageFile);
+      }
+
       const { data } = await axios.post(
         `/api/user/updateUser/${currentUser.id}`,
+        formData,
         {
-          fullname: currentUser.fullname,
-          username: currentUser.username,
-          bio: currentUser.bio,
-          profilePic: currentUser.profilePic,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       localStorage.setItem("currentUser", JSON.stringify(data.user));
+      setLoading(false);
       toast.success("Profile Updated");
-
-      console.log(data);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -64,21 +85,37 @@ const UserProfile = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log(file);
 
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result && typeof reader.result === "string") {
-          console.log(reader.result);
-
           setCurrentUser({ ...currentUser, profilePic: reader.result });
+          setImageFile(file);
         }
       };
 
       reader.readAsDataURL(file);
     }
+  };
 
-    setImageSelected(true);
+  const handleRemoveImage = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+    e.preventDefault();
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    setCurrentUser({ ...currentUser, profilePic: "" });
+    setImageFile(null);
+  };
+
+  const handleCancelChanges = () => {
+    const storageData = localStorage.getItem("currentUser");
+    if (storageData) {
+      setCurrentUser(JSON.parse(storageData));
+    }
   };
 
   return (
@@ -91,8 +128,10 @@ const UserProfile = () => {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DialogTrigger>
-              <DropdownMenuItem>Profile Settings</DropdownMenuItem>
+            <DialogTrigger className="w-full">
+              <DropdownMenuItem className="w-full">
+                Profile Settings
+              </DropdownMenuItem>
             </DialogTrigger>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
@@ -125,14 +164,17 @@ const UserProfile = () => {
                         src={currentUser.profilePic}
                         className="w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover"
                       />
-                      {isImageSelected && (
-                        <IoMdCloseCircle className="text-red-500 absolute right-0 top-0 text-2xl bg-black rounded-full" />
-                      )}
+
+                      <IoMdCloseCircle
+                        className="text-red-500 absolute right-0 top-0 text-2xl bg-black rounded-full cursor-pointer"
+                        onClick={(e) => handleRemoveImage(e)}
+                      />
                     </div>
                   )}
                 </label>
                 <input
                   id="pic"
+                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   className="sm:file:mr-6 border p-3 rounded-lg"
@@ -181,7 +223,32 @@ const UserProfile = () => {
                   className="p-2 rounded-lg bg-transparent border-2 w-full h-28"
                 />
               </div>
-              <button className="p-2 rounded-lg bg-green-500">Save</button>
+              <div className="flex justify-between gap-4">
+                <div
+                  className="p-2 rounded-lg bg-red-500 w-full text-center cursor-pointer"
+                  onClick={handleCancelChanges}
+                >
+                  <span>Cancel changes</span>
+                </div>
+                <button
+                  type="submit"
+                  className="p-2 rounded-lg bg-green-500 w-full flex justify-center items-center"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <RotatingLines
+                      visible={true}
+                      width="25"
+                      strokeWidth="5"
+                      strokeColor="white"
+                      animationDuration="0.75"
+                      ariaLabel="rotating-lines-loading"
+                    />
+                  ) : (
+                    "Save changes"
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </DialogContent>

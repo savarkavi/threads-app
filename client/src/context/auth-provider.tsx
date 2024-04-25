@@ -2,8 +2,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 type ContextTypes = {
-  currentUser: UserObject | null;
-  setCurrentUser: React.Dispatch<React.SetStateAction<UserObject | null>>;
+  currentUser: UserObject | null | "loading";
+  setCurrentUser: React.Dispatch<
+    React.SetStateAction<UserObject | null | "loading">
+  >;
 };
 
 type UserObject = {
@@ -30,7 +32,9 @@ export const AuthContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [currentUser, setCurrentUser] = useState<UserObject | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserObject | null | "loading">(
+    "loading"
+  );
 
   useEffect(() => {
     const storageUser = localStorage.getItem("currentUser");

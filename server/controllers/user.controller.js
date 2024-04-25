@@ -1,4 +1,6 @@
 import User from "../models/user.model.js";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs/promises";
 
 export const followUser = async (req, res) => {
   try {
@@ -34,7 +36,9 @@ export const followUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { fullname, username, profilePic, bio } = req.body;
+    const { fullname, username, bio } = req.body;
+    const imagePath = req.file?.path;
+    let imageUrl = "";
 
     const userId = req.user._id;
 
@@ -43,11 +47,17 @@ export const updateUser = async (req, res) => {
         .status(400)
         .json({ message: "You cannot update other user's profile." });
 
-    const user = await User.findByIdAndUpdate(userId);
+    const user = await User.findById(userId);
+
+    if (imagePath) {
+      const uploadRes = await cloudinary.uploader.upload(imagePath);
+      imageUrl = uploadRes.secure_url;
+      await fs.unlink(imagePath);
+    }
 
     user.fullname = fullname || user.fullname;
     user.username = username || user.username;
-    user.profilePic = profilePic || user.profilePic;
+    user.profilePic = imageUrl ? imageUrl : "";
     user.bio = bio || user.bio;
 
     const updatedUser = await user.save();
@@ -55,6 +65,7 @@ export const updateUser = async (req, res) => {
     res.status(200).json({
       message: "Profile updated successfully!",
       user: {
+        id: updatedUser._id,
         fullname: updatedUser.fullname,
         username: updatedUser.username,
         email: updatedUser.email,
@@ -72,9 +83,7 @@ export const getUser = async (req, res) => {
   try {
     const { username } = req.params;
 
-    const user = await User.findOne({ username })
-      .select("-password")
-      .select("-__v");
+    const user = await User.findOne({ username }).select("-password -__v");
 
     if (!user) return res.status(404).json({ message: "User not found" });
 

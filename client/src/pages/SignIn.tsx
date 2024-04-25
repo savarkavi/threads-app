@@ -3,7 +3,7 @@ import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 type FormData = {
   username: string;
@@ -16,7 +16,11 @@ const SignIn = () => {
     password: "",
   });
 
-  const { setCurrentUser } = useAuthContext();
+  const { currentUser, setCurrentUser } = useAuthContext();
+
+  if (currentUser) {
+    return <Navigate to="/" />;
+  }
 
   const handleFormSubmission = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

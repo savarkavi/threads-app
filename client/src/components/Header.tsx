@@ -17,7 +17,7 @@ const Header = () => {
       <img
         src={`${theme === "dark" ? "/icon-dark.svg" : "/icon-light.svg"}`}
         alt="logo"
-        className="w-12 h-12 cursor-pointer"
+        className="w-12 h-12 cursor-pointer self-center"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       />
       {currentUser && <UserProfile />}
