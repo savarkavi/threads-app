@@ -1,13 +1,28 @@
 import Post from "../models/post.model.js";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs/promises";
 
 export const createPost = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    const { text } = req.body;
+    const imagePath = req.file?.path;
+    let imageUrl = "";
+
     const postedBy = req.user._id;
 
     if (!text) return res.status(400).json({ message: "Invalid text input" });
 
-    const newPost = await new Post({ postedBy, text, image }).save();
+    if (imagePath) {
+      const uploadRes = await cloudinary.uploader.upload(imagePath);
+      imageUrl = uploadRes.secure_url;
+      await fs.unlink(imagePath);
+    }
+
+    const newPost = await new Post({
+      postedBy,
+      text,
+      image: imageUrl ? imageUrl : "",
+    }).save();
     res.status(201).json({ message: "Post created successfully", newPost });
   } catch (error) {
     console.log(error.message);
@@ -111,6 +126,19 @@ export const replyPost = async (req, res) => {
     const updatedPost = await post.save();
 
     res.status(201).json({ message: "Reply sent", updatedPost });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getLatestPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({})
+      .sort({ createdAt: -1 })
+      .select("-__v -updatedAt")
+      .populate({ path: "postedBy", select: "-password -__v" });
+    res.status(200).json(posts);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something went wrong" });

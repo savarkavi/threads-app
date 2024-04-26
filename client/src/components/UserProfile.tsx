@@ -61,7 +61,7 @@ const UserProfile = () => {
       formData.append("bio", currentUser.bio);
 
       if (imageFile) {
-        formData.append("profilePic", imageFile);
+        formData.append("file", imageFile);
       }
 
       const { data } = await axios.post(
@@ -85,7 +85,6 @@ const UserProfile = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log(file);
 
     if (file) {
       const reader = new FileReader();
@@ -232,7 +231,7 @@ const UserProfile = () => {
                 </div>
                 <button
                   type="submit"
-                  className="p-2 rounded-lg bg-green-500 w-full flex justify-center items-center"
+                  className="p-2 rounded-lg bg-green-500 w-full flex justify-center items-center disabled:cursor-not-allowed"
                   disabled={loading}
                 >
                   {loading ? (

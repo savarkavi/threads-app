@@ -10,3 +10,14 @@ export type UserDataType = {
   followers: string[];
   following: string[];
 };
+
+export type PostDataType = {
+  _id: string;
+  text: string;
+  image: string;
+  createdAt: string;
+  isReply: boolean;
+  postedBy: UserDataType;
+  likes: string[];
+  replies: string[];
+};

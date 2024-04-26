@@ -1,13 +1,18 @@
 import { Link } from "react-router-dom";
 import PostInfo from "./PostInfo";
+import { PostDataType } from "@/utils/types";
 
-const UserPost = () => {
+const UserPost = ({ post }: { post: PostDataType }) => {
   return (
-    <Link to="/sushant/post/1" className="flex gap-8 w-full py-6">
-      <div className="flex flex-col justify-between">
+    <Link to="/sushant/post/1" className="flex gap-4 sm:gap-8 w-full py-6">
+      <div className="flex flex-col justify-between flex-shrink-0">
         <div className="flex flex-col items-center h-full self-start">
           <img
-            src="/sushant-img.jpg"
+            src={
+              post.postedBy.profilePic
+                ? post.postedBy.profilePic
+                : "/profile.png"
+            }
             alt="profile photo"
             className="w-12 h-12 rounded-full object-cover flex-shrink-0"
           />
@@ -34,7 +39,7 @@ const UserPost = () => {
         </div>
       </div>
 
-      <PostInfo />
+      <PostInfo post={post} />
     </Link>
   );
 };
