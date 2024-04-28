@@ -2,6 +2,7 @@ import { useTheme } from "../context/theme-provider";
 import { IoMdHome } from "react-icons/io";
 import { useAuthContext } from "@/context/auth-provider";
 import UserProfile from "./UserProfile";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
@@ -13,7 +14,11 @@ const Header = () => {
         currentUser ? "justify-between" : "justify-center"
       } py-4 mb-16 lg:mb-20`}
     >
-      {currentUser && <IoMdHome className="text-3xl sm:text-4xl" />}
+      {currentUser && (
+        <Link to="/">
+          <IoMdHome className="text-3xl sm:text-4xl" />
+        </Link>
+      )}
       <img
         src={`${theme === "dark" ? "/icon-dark.svg" : "/icon-light.svg"}`}
         alt="logo"

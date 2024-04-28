@@ -1,20 +1,45 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Comments from "@/components/Comments";
 import PostInfo from "@/components/PostInfo";
-import { IoIosSend } from "react-icons/io";
+import { PostDataType } from "@/utils/types";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
 const UserPostPage = () => {
+  const { postId } = useParams();
+  const [postData, setPostData] = useState<PostDataType | null>(null);
+
+  useEffect(() => {
+    try {
+      const fetchPost = async () => {
+        const { data } = await axios.get(`/api/posts/${postId}`);
+        setPostData(data);
+      };
+
+      fetchPost();
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  }, [postId]);
+
+  console.log(postData);
+
+  if (!postData) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="min-h-screen">
-      <PostInfo postPage />
-      <form className="w-full relative my-8">
-        <input
-          name="comment"
-          placeholder="👋 write a comment..."
-          className="bg-transparent px-3 py-6 border-y w-full"
-        />
-        <IoIosSend className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl" />
-      </form>
-      <Comments />
+    <div className="">
+      <PostInfo
+        postPage
+        post={postData}
+        setPostData={setPostData}
+        postId={postId}
+      />
+      {/* <Comments /> */}
     </div>
   );
 };

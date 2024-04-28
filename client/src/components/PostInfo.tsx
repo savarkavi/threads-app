@@ -1,27 +1,65 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SlOptions } from "react-icons/sl";
 import { FaRegHeart } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
 import { CiShare2 } from "react-icons/ci";
 import { IoIosSend } from "react-icons/io";
-import { IoChatbubbleOutline } from "react-icons/io5";
 import { PostDataType } from "@/utils/types";
+import { format } from "date-fns/format";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useAuthContext } from "@/context/auth-provider";
+import PostForm from "./PostForm";
 
 const PostInfo = ({
   postPage,
   comment,
+  postId,
   post,
+  allPosts,
+  setPostsData,
+  setPostData,
 }: {
   postPage?: boolean;
   comment?: boolean;
+  postId?: string;
   post: PostDataType;
+  allPosts?: PostDataType[];
+  setPostsData?: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
+  setPostData?: React.Dispatch<React.SetStateAction<PostDataType | null>>;
 }) => {
-  const handlePostActions = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+  const { currentUser } = useAuthContext();
+
+  if (!currentUser || currentUser === "loading") return null;
+
+  const handlePostLike = async (
+    e: React.MouseEvent<SVGElement, MouseEvent>
+  ) => {
     e.preventDefault();
+
+    try {
+      const { data } = await axios.post(`/api/posts/like/${post._id}`);
+      if (allPosts && setPostsData) {
+        const updatedAllPosts = allPosts.map((el) =>
+          el._id === post._id ? { ...el, likes: data.updatedPost.likes } : el
+        );
+        setPostsData(updatedAllPosts);
+      }
+
+      if (setPostData) {
+        setPostData({ ...post, likes: data.updatedPost.likes });
+      }
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
   };
 
   return (
     <div
-      className={`w-full flex-[60%] flex flex-col gap-6 ${
-        comment && "border-b border-gray-300 dark:border-gray-500 py-6"
+      className={`w-full flex flex-col gap-6 rounded-xl ${
+        (comment && "border-b border-gray-300 dark:border-gray-500 py-6") ||
+        (postPage && "border-y p-4 bg-[#020817]")
       }`}
     >
       <div className="flex items-center justify-between">
@@ -44,13 +82,13 @@ const PostInfo = ({
           </h2>
         </div>
         <div className="flex items-center gap-4 text-sm">
-          <span>1d</span>
+          <span>{format(post.createdAt, "MMM d")}</span>
           <SlOptions />
         </div>
       </div>
-      <div className="w-full max-w-[500px] flex flex-col">
-        <p className="w-full break-words">
-          ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+      <div className={`w-full ${!post.image && "min-h-[60px]"} flex flex-col`}>
+        <p className="max-w-[250px] sm:max-w-[500px] break-words">
+          {post.text}
         </p>
         {post.image && (
           <img
@@ -66,15 +104,25 @@ const PostInfo = ({
       </div>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-6 text-xl sm:text-2xl">
-          <FaRegHeart onClick={handlePostActions} />
-          <IoChatbubbleOutline />
+          {post.likes.includes(currentUser.id) ? (
+            <FaHeart
+              onClick={handlePostLike}
+              className="text-red-500 cursor-pointer"
+            />
+          ) : (
+            <FaRegHeart onClick={handlePostLike} className="cursor-pointer" />
+          )}
+          <PostForm comment postId={postId} />
+
           <CiShare2 />
           <IoIosSend />
         </div>
         <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-          <p>500 replies</p>
+          <p>{`${
+            post.replies.length === 0 ? 0 : post.replies.length
+          } replies`}</p>
           <span className="w-1 h-1 rounded-full bg-gray-500"></span>
-          <p>1276 likes</p>
+          <p>{`${post.likes.length === 0 ? 0 : post.likes.length} likes`}</p>
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ function App() {
   return (
     <div
       className={`w-full min-h-screen px-6 ${
-        theme === "dark" ? "dark bg-zinc-950" : "bg-white"
+        theme === "dark" ? "dark bg-neutral-950" : "bg-white"
       }`}
     >
       <div className="max-w-[768px] mx-auto bg-white dark:bg-zinc-950">

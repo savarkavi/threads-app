@@ -10,14 +10,19 @@ import { Navigate } from "react-router-dom";
 
 const HomePage = () => {
   const { currentUser } = useAuthContext();
-  const [postData, setPostData] = useState([]);
+  const [latestPostsData, setLatestPostsData] = useState<PostDataType[] | null>(
+    null
+  );
+  const [followingPostsData, setFollowingPostsData] = useState<
+    PostDataType[] | null
+  >(null);
+  const [isLatestPost, setIsLatestPost] = useState(true);
 
   useEffect(() => {
     try {
       const fetchPosts = async () => {
         const { data } = await axios.get("/api/posts/getPosts/latestPosts");
-        console.log(data);
-        setPostData(data);
+        setLatestPostsData(data);
       };
 
       fetchPosts();
@@ -27,24 +32,80 @@ const HomePage = () => {
     }
   }, []);
 
+  const handleFetchFollowingPosts = async () => {
+    setIsLatestPost(false);
+
+    try {
+      const fetchPosts = async () => {
+        const { data } = await axios.get("/api/posts/getPosts/followingPosts");
+        console.log(data);
+        setFollowingPostsData(data);
+      };
+
+      fetchPosts();
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
   if (!currentUser) {
     return <Navigate to="/auth/signin" />;
   }
 
+  if (!latestPostsData) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
+      <PostForm setLatestPostsData={setLatestPostsData} />
+
       <div className="w-full border-b border-gray-400 dark:border-gray-500 flex">
-        <div className="p-3 w-full text-center cursor-pointer border-b border-black dark:border-white">
+        <div
+          className={`p-3 w-full text-center cursor-pointer ${
+            isLatestPost && "border-b border-black dark:border-white"
+          }`}
+          onClick={() => setIsLatestPost(true)}
+        >
           Latest Posts
         </div>
-        <div className="p-3 w-full text-center cursor-pointer">Following</div>
+        <div
+          className={`p-3 w-full text-center cursor-pointer ${
+            !isLatestPost && "border-b border-black dark:border-white"
+          }`}
+          onClick={handleFetchFollowingPosts}
+        >
+          Following
+        </div>
       </div>
-      <div>
-        {postData.map((post: PostDataType) => {
-          return <UserPost key={post._id} post={post} />;
-        })}
-      </div>
-      <PostForm />
+      {isLatestPost ? (
+        <div>
+          {latestPostsData.map((post: PostDataType) => {
+            return (
+              <UserPost
+                key={post._id}
+                post={post}
+                allPosts={latestPostsData}
+                setPostsData={setLatestPostsData}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <div>
+          {followingPostsData?.map((post: PostDataType) => {
+            return (
+              <UserPost
+                key={post._id}
+                post={post}
+                allPosts={followingPostsData}
+                setPostsData={setFollowingPostsData}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -13,8 +13,20 @@ import { IoMdCloseCircle } from "react-icons/io";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { RotatingLines } from "react-loader-spinner";
+import { PostDataType } from "@/utils/types";
+import { IoChatbubbleOutline } from "react-icons/io5";
 
-const PostForm = () => {
+const PostForm = ({
+  setLatestPostsData,
+  comment,
+  postId,
+}: {
+  setLatestPostsData?: React.Dispatch<
+    React.SetStateAction<PostDataType[] | null>
+  >;
+  comment?: boolean;
+  postId?: string;
+}) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState("");
   const [textContent, setTextContent] = useState("");
@@ -68,20 +80,43 @@ const PostForm = () => {
         formData.append("file", imageFile);
       }
 
-      const { data } = await axios.post(`/api/posts/create`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      if (comment) {
+        const { data } = await axios.post(
+          `/api/posts/createReply/${postId}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-      console.log(data);
+        console.log(data);
+      } else {
+        const { data } = await axios.post(`/api/posts/create`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (setLatestPostsData) {
+          setLatestPostsData(data.posts);
+        }
+      }
+
       setLoading(false);
       setTextContent("");
       setImagePreview("");
       setImageFile(null);
       setRemainingChar(300);
-      toast.success("Post created!");
+
+      if (comment) {
+        toast.success("Reply sent");
+      } else {
+        toast.success("Post created!");
+      }
     } catch (error: any) {
+      setLoading(false);
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -90,19 +125,25 @@ const PostForm = () => {
   return (
     <Dialog>
       <DialogTrigger>
-        <div className="fixed right-4 bottom-8 2xl:right-10 2xl:bottom-14 text-white bg-zinc-800 p-4 lg:py-2 lg:px-6 rounded-full lg:rounded-lg flex items-center gap-2 z-[99]">
-          <FaPlus className="text-xl" />
-          <span className="hidden lg:block text-white lg:text-lg">Post</span>
-        </div>
+        {comment ? (
+          <IoChatbubbleOutline className="cursor-pointer" />
+        ) : (
+          <div className="fixed right-4 bottom-8 2xl:right-10 2xl:bottom-14 text-white bg-zinc-800 p-4 lg:py-2 lg:px-6 rounded-full lg:rounded-lg flex items-center gap-2 z-[99]">
+            <FaPlus className="text-xl" />
+            <span className="hidden lg:block text-white lg:text-lg">Post</span>
+          </div>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Post</DialogTitle>
+          <DialogTitle>
+            {comment ? "Reply to this post" : "Create a post"}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handlePostSubmit}>
           <div>
             <textarea
-              placeholder="write your post here..."
+              placeholder={`write your ${comment ? "reply" : "post"} here...`}
               className="w-full h-[250px] rounded-lg p-6 bg-transparent border-2"
               value={textContent}
               onChange={(e) => handleTextContentChange(e)}
@@ -148,7 +189,7 @@ const PostForm = () => {
             <div className="mt-3 relative">
               <img
                 src={imagePreview}
-                className="rounded-lg max-h-[400px] w-full object-cover"
+                className="rounded-lg max-h-[350px] w-full object-cover"
               />
               {imagePreview && (
                 <IoMdCloseCircle
