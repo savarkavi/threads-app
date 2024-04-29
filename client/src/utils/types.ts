@@ -19,5 +19,5 @@ export type PostDataType = {
   isReply: boolean;
   postedBy: UserDataType;
   likes: string[];
-  replies: string[];
+  replies: PostDataType[];
 };

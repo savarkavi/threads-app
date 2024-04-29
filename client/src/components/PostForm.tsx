@@ -17,13 +17,13 @@ import { PostDataType } from "@/utils/types";
 import { IoChatbubbleOutline } from "react-icons/io5";
 
 const PostForm = ({
-  setLatestPostsData,
+  setPostsData,
+  setPostData,
   comment,
   postId,
 }: {
-  setLatestPostsData?: React.Dispatch<
-    React.SetStateAction<PostDataType[] | null>
-  >;
+  setPostsData?: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
+  setPostData?: React.Dispatch<React.SetStateAction<PostDataType | null>>;
   comment?: boolean;
   postId?: string;
 }) => {
@@ -90,8 +90,14 @@ const PostForm = ({
             },
           }
         );
+        if (setPostsData) {
+          setPostsData(data.posts);
+        }
 
-        console.log(data);
+        if (setPostData) {
+          data.updatedPost.replies.reverse();
+          setPostData(data.updatedPost);
+        }
       } else {
         const { data } = await axios.post(`/api/posts/create`, formData, {
           headers: {
@@ -99,8 +105,8 @@ const PostForm = ({
           },
         });
 
-        if (setLatestPostsData) {
-          setLatestPostsData(data.posts);
+        if (setPostsData) {
+          setPostsData(data.posts);
         }
       }
 

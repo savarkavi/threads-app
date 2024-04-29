@@ -12,11 +12,13 @@ function App() {
 
   return (
     <div
-      className={`w-full min-h-screen px-6 ${
-        theme === "dark" ? "dark bg-neutral-950" : "bg-white"
+      className={`w-full min-h-screen ${
+        theme === "dark"
+          ? "bg-gradient-to-b from-[#121212] to-[#000000]"
+          : "bg-white"
       }`}
     >
-      <div className="max-w-[768px] mx-auto bg-white dark:bg-zinc-950">
+      <div className="max-w-[768px] mx-auto bg-white dark:bg-zinc-950 border">
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />

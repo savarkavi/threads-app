@@ -10,7 +10,7 @@ const Header = () => {
 
   return (
     <div
-      className={`w-full flex items-center ${
+      className={`w-full flex items-center p-6 ${
         currentUser ? "justify-between" : "justify-center"
       } py-4 mb-16 lg:mb-20`}
     >

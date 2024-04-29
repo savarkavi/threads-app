@@ -10,11 +10,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "@/context/auth-provider";
 import PostForm from "./PostForm";
+import { Link } from "react-router-dom";
 
 const PostInfo = ({
   postPage,
   comment,
-  postId,
   post,
   allPosts,
   setPostsData,
@@ -35,8 +35,6 @@ const PostInfo = ({
   const handlePostLike = async (
     e: React.MouseEvent<SVGElement, MouseEvent>
   ) => {
-    e.preventDefault();
-
     try {
       const { data } = await axios.post(`/api/posts/like/${post._id}`);
       if (allPosts && setPostsData) {
@@ -57,9 +55,9 @@ const PostInfo = ({
 
   return (
     <div
-      className={`w-full flex flex-col gap-6 rounded-xl ${
-        (comment && "border-b border-gray-300 dark:border-gray-500 py-6") ||
-        (postPage && "border-y p-4 bg-[#020817]")
+      className={`w-full flex flex-col gap-6 ${
+        (comment && "border-y border-gray-300 dark:border-gray-500 p-6") ||
+        (postPage && "p-4 bg-zinc-950")
       }`}
     >
       <div className="flex items-center justify-between">
@@ -112,15 +110,21 @@ const PostInfo = ({
           ) : (
             <FaRegHeart onClick={handlePostLike} className="cursor-pointer" />
           )}
-          <PostForm comment postId={postId} />
-
+          <div>
+            <PostForm
+              comment
+              postId={post._id}
+              setPostsData={setPostsData}
+              setPostData={setPostData}
+            />
+          </div>
           <CiShare2 />
           <IoIosSend />
         </div>
         <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-          <p>{`${
+          <Link to={`/${post.postedBy.username}/post/${post._id}`}>{`${
             post.replies.length === 0 ? 0 : post.replies.length
-          } replies`}</p>
+          } replies`}</Link>
           <span className="w-1 h-1 rounded-full bg-gray-500"></span>
           <p>{`${post.likes.length === 0 ? 0 : post.likes.length} likes`}</p>
         </div>

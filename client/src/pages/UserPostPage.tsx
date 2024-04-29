@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Comments from "@/components/Comments";
 import PostInfo from "@/components/PostInfo";
 import { PostDataType } from "@/utils/types";
 import axios from "axios";
@@ -15,6 +14,7 @@ const UserPostPage = () => {
     try {
       const fetchPost = async () => {
         const { data } = await axios.get(`/api/posts/${postId}`);
+        data.replies.reverse();
         setPostData(data);
       };
 
@@ -25,21 +25,32 @@ const UserPostPage = () => {
     }
   }, [postId]);
 
-  console.log(postData);
-
   if (!postData) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="">
+    <div className="min-h-screen">
       <PostInfo
         postPage
         post={postData}
         setPostData={setPostData}
         postId={postId}
       />
-      {/* <Comments /> */}
+      <div className="mt-16">
+        <h2 className="text-3xl font-semibold px-6">{`${
+          postData.replies.length
+        } ${postData.replies.length === 1 ? "Comment" : "Comments"}`}</h2>
+        <div className="mt-6">
+          {postData.replies.map((reply) => {
+            return (
+              <div key={reply._id}>
+                <PostInfo post={reply} comment setPostData={setPostData} />
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

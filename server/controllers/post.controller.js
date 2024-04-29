@@ -66,13 +66,22 @@ export const createReply = async (req, res) => {
     }).save();
 
     post.replies.push(newReply._id);
-    const updatedPost = await post.save();
+    await post.save();
 
-    const posts = await Post.find({})
+    const updatedPost = await Post.findById(postId)
+      .select("-__v -updatedAt")
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
+
+    const posts = await Post.find({ isReply: false })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
       .populate({ path: "postedBy", select: "-password -__v" });
-    res.status(201).json({ message: "Reply sent", posts });
+    res.status(201).json({ message: "Reply sent", posts, updatedPost });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something went wrong" });
@@ -85,7 +94,12 @@ export const getPost = async (req, res) => {
 
     const post = await Post.findById(postId)
       .select("-__v -updatedAt")
-      .populate({ path: "postedBy", select: "-password -__v" });
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
 
     if (!post) return res.status(404).json({ message: "Post not found" });
 
@@ -149,34 +163,6 @@ export const likePost = async (req, res) => {
       );
       return res.status(200).json({ message: "Post liked", updatedPost });
     }
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: "Something went wrong" });
-  }
-};
-
-export const replyPost = async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const { text, image } = req.body;
-    const postedBy = req.user._id;
-
-    if (!text) return res.status(400).json({ message: "Invalid text input" });
-    const post = await Post.findById(postId);
-
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    const newReply = await new Post({
-      postedBy,
-      text,
-      image,
-      isReply: true,
-    }).save();
-
-    post.replies.push(newReply._id);
-    const updatedPost = await post.save();
-
-    res.status(201).json({ message: "Reply sent", updatedPost });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something went wrong" });
