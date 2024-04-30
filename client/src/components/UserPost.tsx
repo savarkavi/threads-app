@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import PostInfo from "./PostInfo";
-import { PostDataType } from "@/utils/types";
+import { PostDataType, UserDataType } from "@/utils/types";
 
 const UserPost = ({
   post,
@@ -10,6 +11,8 @@ const UserPost = ({
   allPosts: PostDataType[];
   setPostsData: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
 }) => {
+  console.log(post);
+
   return (
     <div className="flex gap-4 sm:gap-8 w-full p-6 border-b bg-zinc-950">
       <div className="flex flex-col justify-between flex-shrink-0">
@@ -25,25 +28,43 @@ const UserPost = ({
           />
           <div className="w-[1px] bg-black dark:bg-white h-full"></div>
         </div>
-        <div className="flex flex-col w-full gap-2 items-center self-start">
-          <div className="flex items-center gap-2">
-            <img
-              src="/robot.jpg"
-              alt="profile photo"
-              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
-            />
-            <img
-              src="/placeholder.jpg"
-              alt="profile photo"
-              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
-            />
+        {post.replies.length > 0 && (
+          <div className="flex flex-col w-full gap-2 items-center self-start">
+            <div className="flex items-center gap-2">
+              <img
+                src={
+                  post.replies[0].postedBy.profilePic
+                    ? post.replies[0].postedBy.profilePic
+                    : "/profile.png"
+                }
+                alt="profile photo"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+              />
+              {post.replies[1] && (
+                <img
+                  src={
+                    post.replies[1].postedBy.profilePic
+                      ? post.replies[1].postedBy.profilePic
+                      : "/profile.png"
+                  }
+                  alt="profile photo"
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                />
+              )}
+            </div>
+            {post.replies[2] && (
+              <img
+                src={
+                  post.replies[2].postedBy.profilePic
+                    ? post.replies[2].postedBy.profilePic
+                    : "/profile.png"
+                }
+                alt="profile photo"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+              />
+            )}
           </div>
-          <img
-            src="/bochan.jpeg"
-            alt="profile photo"
-            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
-          />
-        </div>
+        )}
       </div>
 
       <PostInfo post={post} allPosts={allPosts} setPostsData={setPostsData} />

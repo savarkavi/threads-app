@@ -57,8 +57,6 @@ const HomePage = () => {
     return <div>Loading...</div>;
   }
 
-  console.log(latestPostsData);
-
   return (
     <div className="">
       <PostForm setPostsData={setLatestPostsData} />

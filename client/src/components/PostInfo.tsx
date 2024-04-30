@@ -16,6 +16,7 @@ const PostInfo = ({
   postPage,
   comment,
   post,
+  parentPost,
   allPosts,
   setPostsData,
   setPostData,
@@ -24,6 +25,7 @@ const PostInfo = ({
   comment?: boolean;
   postId?: string;
   post: PostDataType;
+  parentPost?: PostDataType;
   allPosts?: PostDataType[];
   setPostsData?: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
   setPostData?: React.Dispatch<React.SetStateAction<PostDataType | null>>;
@@ -35,17 +37,28 @@ const PostInfo = ({
   const handlePostLike = async (
     e: React.MouseEvent<SVGElement, MouseEvent>
   ) => {
+    e.preventDefault();
+
     try {
       const { data } = await axios.post(`/api/posts/like/${post._id}`);
       if (allPosts && setPostsData) {
         const updatedAllPosts = allPosts.map((el) =>
           el._id === post._id ? { ...el, likes: data.updatedPost.likes } : el
         );
-        setPostsData(updatedAllPosts);
+        return setPostsData(updatedAllPosts);
+      }
+
+      if (parentPost && setPostData) {
+        const updatedReplies = parentPost.replies.map((reply: PostDataType) =>
+          reply._id === post._id
+            ? { ...reply, likes: data.updatedPost.likes }
+            : reply
+        );
+        return setPostData({ ...parentPost, replies: updatedReplies });
       }
 
       if (setPostData) {
-        setPostData({ ...post, likes: data.updatedPost.likes });
+        return setPostData({ ...post, likes: data.updatedPost.likes });
       }
     } catch (error: any) {
       console.log(error);

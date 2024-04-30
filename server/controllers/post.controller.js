@@ -25,7 +25,7 @@ export const createPost = async (req, res) => {
       image: imageUrl ? imageUrl : "",
     }).save();
 
-    const posts = await Post.find({})
+    const posts = await Post.find({ isReply: false })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
       .populate({ path: "postedBy", select: "-password -__v" });
@@ -174,7 +174,12 @@ export const getLatestPosts = async (req, res) => {
     const posts = await Post.find({ isReply: false })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
-      .populate({ path: "postedBy", select: "-password -__v" });
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
 
     res.status(200).json(posts);
   } catch (error) {

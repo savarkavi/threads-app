@@ -45,7 +45,12 @@ const UserPostPage = () => {
           {postData.replies.map((reply) => {
             return (
               <div key={reply._id}>
-                <PostInfo post={reply} comment setPostData={setPostData} />
+                <PostInfo
+                  post={reply}
+                  parentPost={postData}
+                  comment
+                  setPostData={setPostData}
+                />
               </div>
             );
           })}
