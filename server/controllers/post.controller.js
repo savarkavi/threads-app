@@ -28,7 +28,12 @@ export const createPost = async (req, res) => {
     const posts = await Post.find({ isReply: false })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
-      .populate({ path: "postedBy", select: "-password -__v" });
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
     res.status(201).json({ message: "Post created successfully", posts });
   } catch (error) {
     console.log(error.message);
@@ -80,7 +85,12 @@ export const createReply = async (req, res) => {
     const posts = await Post.find({ isReply: false })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
-      .populate({ path: "postedBy", select: "-password -__v" });
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
     res.status(201).json({ message: "Reply sent", posts, updatedPost });
   } catch (error) {
     console.log(error.message);
@@ -124,9 +134,9 @@ export const deletePost = async (req, res) => {
         .status(401)
         .json({ message: "You are not authorized to delete this post" });
 
-    await Post.findByIdAndDelete(postId);
+    const deletedPost = await Post.findByIdAndDelete(postId);
 
-    res.status(200).json({ message: "Post deleted successfully" });
+    res.status(200).json({ message: "Post deleted successfully", deletedPost });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something went wrong" });
@@ -192,10 +202,18 @@ export const getFollowingPosts = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    const posts = await Post.find({ postedBy: { $in: user.following } })
+    const posts = await Post.find({
+      postedBy: { $in: user.following },
+      isReply: false,
+    })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
-      .populate({ path: "postedBy", select: "-password -__v" });
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
 
     res.status(200).json(posts);
   } catch (error) {
@@ -212,12 +230,40 @@ export const getUserPosts = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const posts = await Post.find({ postedBy: user._id })
+    const posts = await Post.find({ postedBy: user._id, isReply: false })
       .sort({ createdAt: -1 })
       .select("-__v -updatedAt")
-      .populate({ path: "postedBy", select: "-password -__v" });
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
 
-    console.log(posts);
+    res.status(200).json(posts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getUserReplies = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ username });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const posts = await Post.find({ postedBy: user._id, isReply: true })
+      .sort({ createdAt: -1 })
+      .select("-__v -updatedAt")
+      .populate({ path: "postedBy", select: "-password -__v" })
+      .populate({
+        path: "replies",
+        select: "-__v",
+        populate: { path: "postedBy", select: "-password -__v" },
+      });
 
     res.status(200).json(posts);
   } catch (error) {

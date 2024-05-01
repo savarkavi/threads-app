@@ -52,7 +52,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-8 mt-20">
       <h1 className="text-3xl sm:text-4xl font-semibold">Sign Up</h1>
       <form
         className="bg-gray-200 dark:bg-zinc-900 shadow-2xl rounded-xl w-full mx-auto flex"

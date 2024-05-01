@@ -38,7 +38,6 @@ const HomePage = () => {
     try {
       const fetchPosts = async () => {
         const { data } = await axios.get("/api/posts/getPosts/followingPosts");
-        console.log(data);
         setFollowingPostsData(data);
       };
 
@@ -58,25 +57,27 @@ const HomePage = () => {
   }
 
   return (
-    <div className="">
+    <div className="min-h-screen">
       <PostForm setPostsData={setLatestPostsData} />
 
-      <div className="w-full border-b border-gray-400 dark:border-gray-500 flex">
-        <div
-          className={`p-3 w-full text-center cursor-pointer ${
-            isLatestPost && "border-b border-black dark:border-white"
-          }`}
-          onClick={() => setIsLatestPost(true)}
-        >
-          Latest Posts
-        </div>
-        <div
-          className={`p-3 w-full text-center cursor-pointer ${
-            !isLatestPost && "border-b border-black dark:border-white"
-          }`}
-          onClick={handleFetchFollowingPosts}
-        >
-          Following
+      <div className="w-full border-gray-400 dark:border-gray-500 px-6 mb-6 mt-20">
+        <div className="border-b border-gray-400 dark:border-gray-500 flex">
+          <div
+            className={`p-3 w-full text-center cursor-pointer ${
+              isLatestPost && "border-b border-black dark:border-white"
+            }`}
+            onClick={() => setIsLatestPost(true)}
+          >
+            Latest Posts
+          </div>
+          <div
+            className={`p-3 w-full text-center cursor-pointer ${
+              !isLatestPost && "border-b border-black dark:border-white"
+            }`}
+            onClick={handleFetchFollowingPosts}
+          >
+            Following
+          </div>
         </div>
       </div>
       {isLatestPost ? (
@@ -94,16 +95,22 @@ const HomePage = () => {
         </div>
       ) : (
         <div>
-          {followingPostsData?.map((post: PostDataType) => {
-            return (
-              <UserPost
-                key={post._id}
-                post={post}
-                allPosts={followingPostsData}
-                setPostsData={setFollowingPostsData}
-              />
-            );
-          })}
+          {followingPostsData?.length === 0 ? (
+            <div className="flex justify-center mt-16 text-xl">
+              You are not following anyone
+            </div>
+          ) : (
+            followingPostsData?.map((post: PostDataType) => {
+              return (
+                <UserPost
+                  key={post._id}
+                  post={post}
+                  allPosts={followingPostsData}
+                  setPostsData={setFollowingPostsData}
+                />
+              );
+            })
+          )}
         </div>
       )}
     </div>

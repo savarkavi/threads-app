@@ -22,7 +22,7 @@ import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RotatingLines } from "react-loader-spinner";
 
 const UserProfile = () => {
@@ -118,22 +118,37 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="flex gap-6 items-center">
+    <div className="flex gap-6 items-center flex-shrink-0">
       <Dialog>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="flex justify-end items-center">
-              <img src="/profile.png" className="w-8 h-8 sm:w-10 sm:h-10" />
+              <img
+                src={`${
+                  currentUser.profilePic
+                    ? currentUser.profilePic
+                    : "/profile.png"
+                }`}
+                className="w-8 h-8 rounded-full sm:w-10 sm:h-10 object-cover"
+              />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Link to={`/${currentUser.username}`} className="w-full">
+                Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DialogTrigger className="w-full">
-              <DropdownMenuItem className="w-full">
-                Profile Settings
+              <DropdownMenuItem className="w-full cursor-pointer">
+                Settings
               </DropdownMenuItem>
             </DialogTrigger>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <DialogContent className="w-full p-4">

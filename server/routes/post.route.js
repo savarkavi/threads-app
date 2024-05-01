@@ -7,6 +7,7 @@ import {
   getLatestPosts,
   getPost,
   getUserPosts,
+  getUserReplies,
   likePost,
 } from "../controllers/post.controller.js";
 import authorize from "../middlewares/authorize.js";
@@ -27,5 +28,6 @@ router.post("/like/:postId", authorize, likePost);
 router.get("/getPosts/latestPosts", authorize, getLatestPosts);
 router.get("/getPosts/followingPosts", authorize, getFollowingPosts);
 router.get("/getPosts/userPosts/:username", authorize, getUserPosts);
+router.get("/getPosts/userReplies/:username", authorize, getUserReplies);
 
 export default router;

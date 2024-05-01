@@ -50,8 +50,12 @@ const UserPage = () => {
   }
 
   return (
-    <div className="dark:text-white">
-      <UserHeader userData={userData} setUserData={setUserData} />
+    <div className="dark:text-white min-h-screen">
+      <UserHeader
+        userData={userData}
+        setUserData={setUserData}
+        setUserPosts={setUserPosts}
+      />
       <div>
         {userPosts.map((post: PostDataType) => {
           return (

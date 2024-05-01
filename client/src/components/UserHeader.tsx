@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FaInstagram } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
-import { UserDataType } from "@/utils/types";
+import { PostDataType, UserDataType } from "@/utils/types";
 import { RotatingLines } from "react-loader-spinner";
 
 import {
@@ -18,12 +17,15 @@ import { useAuthContext } from "@/context/auth-provider";
 const UserHeader = ({
   userData,
   setUserData,
+  setUserPosts,
 }: {
   userData: UserDataType;
   setUserData: React.Dispatch<React.SetStateAction<UserDataType | null>>;
+  setUserPosts: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
 }) => {
   const [isFollowed, setIsFollowed] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const [isPostsActive, setIsPostsActive] = useState<boolean>(true);
 
   const { currentUser } = useAuthContext();
 
@@ -83,9 +85,49 @@ const UserHeader = ({
     }
   };
 
+  const handleFetchUserReplies = async () => {
+    setIsPostsActive(false);
+
+    try {
+      const fetchReplies = async () => {
+        const { data } = await axios.get(
+          `/api/posts/getPosts/userReplies/${userData.username}`
+        );
+        setUserPosts(data);
+      };
+
+      fetchReplies();
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const handleFetchUserPosts = async () => {
+    if (isPostsActive) {
+      return;
+    }
+
+    setIsPostsActive(true);
+
+    try {
+      const fetchPosts = async () => {
+        const { data } = await axios.get(
+          `/api/posts/getPosts/userPosts/${userData.username}`
+        );
+        setUserPosts(data);
+      };
+
+      fetchPosts();
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex justify-between">
+    <div className="flex flex-col gap-8 p-6">
+      <div className="flex justify-between mt-20">
         <div className="flex flex-col gap-4 items-start">
           <h1 className="text-2xl sm:text-4xl font-semibold capitalize">
             {userData.fullname}
@@ -93,7 +135,7 @@ const UserHeader = ({
           <h2 className="sm:text-xl">{`@${userData.username}`}</h2>
           {userData.username !== currentUser.username && (
             <button
-              className="py-2 px-6 w-[100px] text-sm rounded-lg bg-zinc-800 flex justify-center items-center"
+              className="py-2 px-6 w-[100px] text-sm rounded-lg border border-black bg-gray-200 dark:bg-zinc-800 flex justify-center items-center"
               onClick={handleFollowUser}
               disabled={loading}
             >
@@ -129,7 +171,6 @@ const UserHeader = ({
               <p>{`${userData.following.length} following`}</p>
             </div>
             <div className="flex gap-4 text-2xl">
-              <FaInstagram />
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <SlOptions className="border border-black dark:border-white rounded-full p-1" />
@@ -148,10 +189,22 @@ const UserHeader = ({
         </div>
       </div>
       <div className="w-full border-b border-gray-400 dark:border-gray-500 flex">
-        <div className="p-3 w-full text-center cursor-pointer border-b border-black dark:border-white">
+        <div
+          className={`p-3 w-full text-center cursor-pointer ${
+            isPostsActive && "border-b border-black dark:border-white"
+          }`}
+          onClick={handleFetchUserPosts}
+        >
           Posts
         </div>
-        <div className="p-3 w-full text-center cursor-pointer">Replies</div>
+        <div
+          className={`p-3 w-full text-center cursor-pointer ${
+            !isPostsActive && "border-b border-black dark:border-white"
+          }`}
+          onClick={handleFetchUserReplies}
+        >
+          Replies
+        </div>
       </div>
     </div>
   );

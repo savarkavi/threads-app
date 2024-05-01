@@ -37,11 +37,11 @@ const UserPostPage = () => {
         setPostData={setPostData}
         postId={postId}
       />
-      <div className="mt-16">
-        <h2 className="text-3xl font-semibold px-6">{`${
+      <div className="mt-24">
+        <h2 className="text-xl sm:text-2xl font-semibold px-6">{`${
           postData.replies.length
         } ${postData.replies.length === 1 ? "Comment" : "Comments"}`}</h2>
-        <div className="mt-6">
+        <div className="mt-10">
           {postData.replies.map((reply) => {
             return (
               <div key={reply._id}>

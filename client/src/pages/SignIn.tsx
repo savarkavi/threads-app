@@ -48,7 +48,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-8 mt-20">
       <h1 className="text-3xl sm:text-4xl font-semibold">Sign In</h1>
       <form
         className="bg-gray-200 dark:bg-zinc-900 shadow-2xl rounded-xl w-full mx-auto flex"
@@ -67,7 +67,7 @@ const SignIn = () => {
             </label>
             <input
               id="username"
-              className="border border-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
+              className="border border-white text-black dark:text-white bg-white dark:bg-transparent rounded-lg p-3 w-full"
               value={inputs.username}
               onChange={(e) =>
                 setInputs({ ...inputs, username: e.target.value })

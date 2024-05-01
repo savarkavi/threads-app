@@ -1,6 +1,5 @@
-import { useEffect } from "react";
 import PostInfo from "./PostInfo";
-import { PostDataType, UserDataType } from "@/utils/types";
+import { PostDataType } from "@/utils/types";
 
 const UserPost = ({
   post,
@@ -11,10 +10,8 @@ const UserPost = ({
   allPosts: PostDataType[];
   setPostsData: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
 }) => {
-  console.log(post);
-
   return (
-    <div className="flex gap-4 sm:gap-8 w-full p-6 border-b bg-zinc-950">
+    <div className="flex gap-4 sm:gap-8 w-full p-6 border-b border-gray-400 bg-white dark:bg-zinc-950">
       <div className="flex flex-col justify-between flex-shrink-0">
         <div className="flex flex-col items-center h-full self-start">
           <img
@@ -33,8 +30,8 @@ const UserPost = ({
             <div className="flex items-center gap-2">
               <img
                 src={
-                  post.replies[0].postedBy.profilePic
-                    ? post.replies[0].postedBy.profilePic
+                  post.replies[0].postedBy?.profilePic
+                    ? post.replies[0].postedBy?.profilePic
                     : "/profile.png"
                 }
                 alt="profile photo"
@@ -43,8 +40,8 @@ const UserPost = ({
               {post.replies[1] && (
                 <img
                   src={
-                    post.replies[1].postedBy.profilePic
-                      ? post.replies[1].postedBy.profilePic
+                    post.replies[1].postedBy?.profilePic
+                      ? post.replies[1].postedBy?.profilePic
                       : "/profile.png"
                   }
                   alt="profile photo"

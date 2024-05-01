@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SlOptions } from "react-icons/sl";
-import { FaRegHeart } from "react-icons/fa";
-import { FaHeart } from "react-icons/fa";
+import { FaRegHeart, FaHeart, FaTrash } from "react-icons/fa";
 import { CiShare2 } from "react-icons/ci";
 import { IoIosSend } from "react-icons/io";
 import { PostDataType } from "@/utils/types";
@@ -10,7 +8,19 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "@/context/auth-provider";
 import PostForm from "./PostForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const PostInfo = ({
   postPage,
@@ -31,6 +41,7 @@ const PostInfo = ({
   setPostData?: React.Dispatch<React.SetStateAction<PostDataType | null>>;
 }) => {
   const { currentUser } = useAuthContext();
+  const navigate = useNavigate();
 
   if (!currentUser || currentUser === "loading") return null;
 
@@ -66,11 +77,39 @@ const PostInfo = ({
     }
   };
 
+  const handleDeletePost = async () => {
+    try {
+      const { data } = await axios.delete(`/api/posts/${post._id}`);
+      if (setPostsData && allPosts) {
+        const updatedPosts = allPosts.filter(
+          (post: PostDataType) => post._id !== data.deletedPost._id
+        );
+
+        setPostsData(updatedPosts);
+      }
+
+      if (setPostData && comment && parentPost) {
+        const updatedReplies = parentPost.replies.filter(
+          (reply: PostDataType) => reply._id !== post._id
+        );
+        setPostData({ ...parentPost, replies: updatedReplies });
+        return;
+      }
+
+      if (setPostData) {
+        navigate("/");
+      }
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <div
       className={`w-full flex flex-col gap-6 ${
         (comment && "border-y border-gray-300 dark:border-gray-500 p-6") ||
-        (postPage && "p-4 bg-zinc-950")
+        (postPage && "px-6 dark:bg-zinc-950 mt-20")
       }`}
     >
       <div className="flex items-center justify-between">
@@ -88,13 +127,37 @@ const PostInfo = ({
               className="w-16 h-16 rounded-full object-cover"
             />
           )}
-          <h2 className="text-lg sm:text-xl font-semibold">
+          <Link
+            to={`/${post.postedBy.username}`}
+            className="text-lg sm:text-xl font-semibold"
+          >
             {post.postedBy.username}
-          </h2>
+          </Link>
         </div>
         <div className="flex items-center gap-4 text-sm">
           <span>{format(post.createdAt, "MMM d")}</span>
-          <SlOptions />
+          {post.postedBy._id === currentUser.id && (
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <FaTrash className="cursor-pointer" />
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your post.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeletePost}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
       <div className={`w-full ${!post.image && "min-h-[60px]"} flex flex-col`}>

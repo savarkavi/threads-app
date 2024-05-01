@@ -10,21 +10,23 @@ const Header = () => {
 
   return (
     <div
-      className={`w-full flex items-center p-6 ${
-        currentUser ? "justify-between" : "justify-center"
-      } py-4 mb-16 lg:mb-20`}
+      className={`w-full flex items-center relative ${
+        currentUser ? "justify-between p-6" : "justify-center p-10"
+      }`}
     >
       {currentUser && (
         <Link to="/">
           <IoMdHome className="text-3xl sm:text-4xl" />
         </Link>
       )}
-      <img
-        src={`${theme === "dark" ? "/icon-dark.svg" : "/icon-light.svg"}`}
-        alt="logo"
-        className="w-12 h-12 cursor-pointer self-center"
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      />
+      <div className="absolute left-1/2 -translate-x-1/2">
+        <img
+          src={`${theme === "dark" ? "/icon-dark.svg" : "/icon-light.svg"}`}
+          alt="logo"
+          className="w-12 h-12 cursor-pointer self-center"
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+        />
+      </div>
       {currentUser && <UserProfile />}
     </div>
   );
