@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
+import messageRoutes from "./routes/message.route.js";
 import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.listen(PORT, () => {
   console.log(`server connected at Port: ${PORT}`);

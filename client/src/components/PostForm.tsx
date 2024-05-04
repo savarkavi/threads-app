@@ -136,7 +136,7 @@ const PostForm = ({
         ) : (
           <div className="fixed right-4 bottom-8 2xl:right-10 2xl:bottom-14 text-white bg-zinc-800 p-4 lg:py-2 lg:px-6 rounded-full lg:rounded-lg flex items-center gap-2 z-[99]">
             <FaPlus className="text-xl" />
-            <span className="hidden lg:block text-white lg:text-lg">Post</span>
+            <span className="text-white lg:text-lg">Post</span>
           </div>
         )}
       </DialogTrigger>

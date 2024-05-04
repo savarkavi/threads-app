@@ -56,7 +56,7 @@ const UserHeader = ({
   const handleFollowUser = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.post(`/api/user/followUser/${userData._id}`);
+      await axios.post(`/api/user/followUser/${userData._id}`);
       setIsFollowed((prev) => !prev);
 
       if (currentUser) {
@@ -72,7 +72,6 @@ const UserHeader = ({
           });
         }
       }
-      console.log(data);
       setLoading(false);
       toast.success(
         !isFollowed
@@ -135,7 +134,7 @@ const UserHeader = ({
           <h2 className="sm:text-xl">{`@${userData.username}`}</h2>
           {userData.username !== currentUser.username && (
             <button
-              className="py-2 px-6 w-[100px] text-sm rounded-lg border border-black bg-gray-200 dark:bg-zinc-800 flex justify-center items-center"
+              className="py-2 px-6 w-[100px] text-sm rounded-lg bg-blue-600 flex justify-center items-center"
               onClick={handleFollowUser}
               disabled={loading}
             >

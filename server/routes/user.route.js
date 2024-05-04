@@ -2,6 +2,7 @@ import express from "express";
 import authorize from "../middlewares/authorize.js";
 import {
   followUser,
+  getPopularUsers,
   getUser,
   updateUser,
 } from "../controllers/user.controller.js";
@@ -11,6 +12,7 @@ const router = express.Router();
 
 router.post("/followUser/:id", authorize, followUser);
 router.post("/updateUser/:id", authorize, upload.single("file"), updateUser);
-router.get("/getUser/:username", getUser);
+router.get("/getUser/:username", authorize, getUser);
+router.get("/getPopularUsers", authorize, getPopularUsers);
 
 export default router;
