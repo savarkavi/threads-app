@@ -3,7 +3,20 @@ import Message from "../models/message.model.js";
 
 export const getMessages = async (req, res) => {
   try {
-  } catch (error) {}
+    const { recieverId } = req.params;
+    const senderId = req.user._id;
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [senderId, recieverId] },
+    }).populate({ path: "messages" });
+
+    if (!conversation) return res.status(200).json([]);
+
+    res.status(200).json(conversation.messages);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
 };
 
 export const sendMessage = async (req, res) => {
@@ -12,7 +25,7 @@ export const sendMessage = async (req, res) => {
     const senderId = req.user._id;
     const { message } = req.body;
 
-    const newMessage = await new Message({
+    const savedMessage = await new Message({
       sender: senderId,
       reciever: recieverId,
       message,
@@ -23,13 +36,18 @@ export const sendMessage = async (req, res) => {
     });
 
     if (existingConversation) {
-      existingConversation.messages.push(newMessage._id);
+      existingConversation.messages.push(savedMessage._id);
+      await existingConversation.save();
     } else {
       const newConversation = await new Conversation({
         participants: [senderId, recieverId],
-        messages: [newMessage._id],
+        messages: [savedMessage._id],
       }).save();
     }
+
+    const newMessage = await Message.findById(savedMessage._id)
+      .select("-__v")
+      .populate({ path: "sender", select: "-password -__v" });
 
     res.status(201).json({ message: "message sent", newMessage });
   } catch (error) {

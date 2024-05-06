@@ -39,7 +39,7 @@ const RightSidebar = () => {
           return (
             <div key={user._id} className="flex gap-8 w-full items-center">
               <img
-                src={user.profilePic}
+                src={user.profilePic ? user.profilePic : "/profile.png"}
                 alt="profile pic"
                 className="w-14 h-14 rounded-full object-cover flex-shrink-0"
               />

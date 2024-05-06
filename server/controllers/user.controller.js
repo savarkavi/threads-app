@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Conversation from "../models/conversation.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs/promises";
 
@@ -107,6 +108,27 @@ export const getPopularUsers = async (req, res) => {
       .select("-password -__v");
 
     res.status(200).json(users);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getConversationUsers = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const conversations = await Conversation.find({
+      participants: { $in: userId },
+    })
+      .populate({ path: "participants", select: "-password -__v" })
+      .populate({
+        path: "messages",
+        select: "-__v",
+        populate: { path: "sender", select: "-password -__v" },
+      })
+      .select("-__v");
+
+    res.status(200).json(conversations);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });

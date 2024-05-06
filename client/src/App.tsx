@@ -10,12 +10,16 @@ import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
 import { useAuthContext } from "./context/auth-provider";
 import Chat from "./pages/Chat";
-import ChatSidebar from "./components/ChatSidebar";
+import ChatSidebar, { ConversationType } from "./components/ChatSidebar";
+import { useState } from "react";
 
 function App() {
   const { theme } = useTheme();
   const { pathname } = useLocation();
   const { currentUser } = useAuthContext();
+  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(true);
+  const [selectedConversation, setSelectedConversation] =
+    useState<ConversationType | null>(null);
 
   return (
     <div
@@ -25,14 +29,23 @@ function App() {
           : "bg-white"
       } ${pathname.includes("/chat") && "flex"}`}
     >
-      {!pathname.includes("/chat") ? <LeftSidebar /> : <ChatSidebar />}
+      {!pathname.includes("/chat") ? (
+        <LeftSidebar />
+      ) : (
+        <ChatSidebar
+          isChatSidebarOpen={isChatSidebarOpen}
+          setIsChatSidebarOpen={setIsChatSidebarOpen}
+          selectedConversation={selectedConversation}
+          setSelectedConversation={setSelectedConversation}
+        />
+      )}
       <div
         className={`flex w-full ${
           currentUser ? "justify-end" : "justify-center"
         } ${!pathname.includes("/chat") && "max-w-[1440px] mx-auto"}`}
       >
         <div
-          className={`w-full ${
+          className={`w-full flex flex-col justify-between ${
             !pathname.includes("/chat") &&
             "max-w-[640px] 2xl:max-w-[768px] mx-auto xl:mx-0"
           } ${
@@ -40,14 +53,25 @@ function App() {
             "border-x bg-white dark:bg-zinc-950 shadow-lg"
           }`}
         >
-          <Header />
+          <Header
+            isChatSidebarOpen={isChatSidebarOpen}
+            setIsChatSidebarOpen={setIsChatSidebarOpen}
+          />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/:username" element={<UserPage />} />
             <Route path="/:username/post/:postId" element={<UserPostPage />} />
             <Route path="/auth/signup" element={<SignUp />} />
             <Route path="/auth/signin" element={<SignIn />} />
-            <Route path="/chat" element={<Chat />} />
+            <Route
+              path="/chat"
+              element={
+                <Chat
+                  selectedConversation={selectedConversation}
+                  setSelectedConversation={setSelectedConversation}
+                />
+              }
+            />
           </Routes>
         </div>
         {currentUser === null ||

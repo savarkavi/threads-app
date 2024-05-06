@@ -13,12 +13,13 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import UpdateProfileForm from "./UpdateProfileForm";
 
 const UserProfile = () => {
   const { currentUser, setCurrentUser } = useAuthContext();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   if (!currentUser || currentUser === "loading") {
     return null;
@@ -73,7 +74,9 @@ const UserProfile = () => {
         </DropdownMenu>
         <UpdateProfileForm />
       </Dialog>
-      <IoChatbubbleEllipsesSharp className="text-2xl sm:text-3xl" />
+      {!pathname.includes("/chat") && (
+        <IoChatbubbleEllipsesSharp className="text-2xl sm:text-3xl" />
+      )}
     </div>
   );
 };

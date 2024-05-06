@@ -3,7 +3,7 @@ import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 type FormData = {
   fullname: string;
@@ -20,6 +20,7 @@ const SignUp = () => {
     password: "",
   });
   const { currentUser } = useAuthContext();
+  const navigate = useNavigate();
 
   if (currentUser) {
     return <Navigate to="/" />;
@@ -35,7 +36,7 @@ const SignUp = () => {
     }
 
     try {
-      const { data } = await axios.post("/api/auth/signup", inputs);
+      await axios.post("/api/auth/signup", inputs);
       setInputs({
         fullname: "",
         username: "",
@@ -43,8 +44,8 @@ const SignUp = () => {
         password: "",
       });
 
-      localStorage.setItem("currentUser", JSON.stringify(data));
       toast.success("Account successfully created.");
+      navigate("/auth/signin");
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
