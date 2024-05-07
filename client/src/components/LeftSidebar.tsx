@@ -55,7 +55,7 @@ const LeftSidebar = () => {
         </div>
         <div className="flex gap-3 items-center text-xl cursor-pointer hover:text-blue-600 transition-all">
           <IoChatbubbleEllipsesSharp />
-          <span>Messages</span>
+          <Link to={"/chat"}>Messages</Link>
         </div>
         <div
           className="flex gap-3 items-center text-xl cursor-pointer hover:text-blue-600 transition-all"

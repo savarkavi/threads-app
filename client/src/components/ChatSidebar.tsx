@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuthContext } from "@/context/auth-provider";
+import { useConversationsContext } from "@/context/conversations-provider";
 import { UserDataType } from "@/utils/types";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { CiSearch } from "react-icons/ci";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 
@@ -37,25 +35,8 @@ const ChatSidebar = ({
     React.SetStateAction<ConversationType | null>
   >;
 }) => {
-  const [conversations, setConversations] = useState<ConversationType[] | null>(
-    null
-  );
-
+  const { conversations } = useConversationsContext();
   const { currentUser } = useAuthContext();
-
-  useEffect(() => {
-    try {
-      const fetchConversationUsers = async () => {
-        const { data } = await axios.get("/api/user/getConversationUsers");
-        setConversations(data);
-      };
-
-      fetchConversationUsers();
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
-    }
-  }, []);
 
   if (!currentUser || currentUser === "loading") return null;
 
@@ -83,7 +64,7 @@ const ChatSidebar = ({
           </div>
         </form>
         <hr />
-        <div className="">
+        <div className="flex flex-col gap-4">
           {conversations.map((conversation: ConversationType) => {
             const reciever = conversation.participants.find(
               (user) => user._id !== currentUser.id
@@ -107,7 +88,10 @@ const ChatSidebar = ({
                 <div className="flex flex-col gap-2">
                   <h2 className="font-semibold">{reciever?.username}</h2>
                   <p className="text-sm text-gray-400">
-                    {conversation.messages[0].message}
+                    {
+                      conversation.messages[conversation.messages.length - 1]
+                        .message
+                    }
                   </p>
                 </div>
               </div>

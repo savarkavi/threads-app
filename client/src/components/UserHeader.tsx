@@ -9,6 +9,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -26,6 +35,7 @@ const UserHeader = ({
   const [isFollowed, setIsFollowed] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [isPostsActive, setIsPostsActive] = useState<boolean>(true);
+  const [inputMessage, setInputMessage] = useState("");
 
   const { currentUser } = useAuthContext();
 
@@ -124,6 +134,24 @@ const UserHeader = ({
     }
   };
 
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await axios.post(`/api/messages/send/${userData._id}`, {
+        message: inputMessage,
+      });
+
+      setInputMessage("");
+      toast.success("Message sent");
+      setLoading(false);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-8 p-6">
       <div className="flex justify-between mt-20">
@@ -133,26 +161,67 @@ const UserHeader = ({
           </h1>
           <h2 className="sm:text-xl">{`@${userData.username}`}</h2>
           {userData.username !== currentUser.username && (
-            <button
-              className="py-2 px-6 w-[100px] text-sm rounded-lg bg-blue-600 flex justify-center items-center"
-              onClick={handleFollowUser}
-              disabled={loading}
-            >
-              {loading ? (
-                <RotatingLines
-                  visible={true}
-                  width="20"
-                  strokeWidth="5"
-                  strokeColor="white"
-                  animationDuration="0.75"
-                  ariaLabel="rotating-lines-loading"
-                />
-              ) : isFollowed ? (
-                "unfollow"
-              ) : (
-                "follow"
-              )}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                className="py-2 px-6 w-[100px] text-sm rounded-lg bg-blue-600 flex justify-center items-center"
+                onClick={handleFollowUser}
+                disabled={loading}
+              >
+                {loading ? (
+                  <RotatingLines
+                    visible={true}
+                    width="20"
+                    strokeWidth="5"
+                    strokeColor="white"
+                    animationDuration="0.75"
+                    ariaLabel="rotating-lines-loading"
+                  />
+                ) : isFollowed ? (
+                  "unfollow"
+                ) : (
+                  "follow"
+                )}
+              </button>
+              <Dialog>
+                <DialogTrigger>
+                  <button className="py-2 px-6 w-[100px] text-sm rounded-lg bg-blue-600 flex justify-center items-center">
+                    Message
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex gap-2">
+                      <p>Send a message</p>
+                      <span className="capitalize">{userData.fullname}</span>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <form
+                    className="flex flex-col gap-4 items-end"
+                    onSubmit={handleSubmitForm}
+                  >
+                    <textarea
+                      className="border p-2 rounded-lg w-full bg-transparent h-28"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                    />
+                    <button className="py-2 px-6 w-[100px] text-sm rounded-lg bg-green-500 flex justify-center items-center">
+                      {loading ? (
+                        <RotatingLines
+                          visible={true}
+                          width="20"
+                          strokeWidth="5"
+                          strokeColor="white"
+                          animationDuration="0.75"
+                          ariaLabel="rotating-lines-loading"
+                        />
+                      ) : (
+                        "Send"
+                      )}
+                    </button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           )}
         </div>
         <img

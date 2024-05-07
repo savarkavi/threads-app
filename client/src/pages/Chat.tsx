@@ -6,6 +6,7 @@ import { format } from "date-fns/format";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useConversationsContext } from "@/context/conversations-provider";
 
 const Chat = ({
   selectedConversation,
@@ -18,6 +19,7 @@ const Chat = ({
 }) => {
   const [inputMessage, setInputMessage] = useState("");
   const { currentUser } = useAuthContext();
+  const { conversations, setConversations } = useConversationsContext();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,6 +45,18 @@ const Chat = ({
           ...selectedConversation,
           messages: [...selectedConversation.messages, data.newMessage],
         });
+      }
+
+      if (conversations) {
+        const updatedConversations = conversations.map((conversation) =>
+          conversation._id !== selectedConversation?._id
+            ? conversation
+            : {
+                ...conversation,
+                messages: [...conversation.messages, data.newMessage],
+              }
+        );
+        setConversations(updatedConversations);
       }
 
       setInputMessage("");
