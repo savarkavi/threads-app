@@ -1,5 +1,6 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { getRecieverSocketId, io } from "../socket/socket.js";
 
 export const getMessages = async (req, res) => {
   try {
@@ -39,7 +40,7 @@ export const sendMessage = async (req, res) => {
       existingConversation.messages.push(savedMessage._id);
       await existingConversation.save();
     } else {
-      const newConversation = await new Conversation({
+      const savedConversation = await new Conversation({
         participants: [senderId, recieverId],
         messages: [savedMessage._id],
       }).save();
@@ -47,7 +48,12 @@ export const sendMessage = async (req, res) => {
 
     const newMessage = await Message.findById(savedMessage._id)
       .select("-__v")
-      .populate({ path: "sender", select: "-password -__v" });
+      .populate({ path: "sender", select: "-password -__v" })
+      .populate({ path: "reciever", select: "-password -__v" });
+
+    const recieverSocketId = getRecieverSocketId(recieverId);
+
+    io.to(recieverSocketId).emit("newMessage", newMessage);
 
     res.status(201).json({ message: "message sent", newMessage });
   } catch (error) {

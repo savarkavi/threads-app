@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useConversationsContext } from "@/context/conversations-provider";
+import { useSocketContext } from "@/context/socket-provider";
 
 const Chat = ({
   selectedConversation,
@@ -22,11 +23,56 @@ const Chat = ({
   const { conversations, setConversations } = useConversationsContext();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const { socket } = useSocketContext();
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [selectedConversation]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newMessage", (message) => {
+        // if (selectedConversation) {
+        //   setSelectedConversation({
+        //     ...selectedConversation,
+        //     messages: [...selectedConversation.messages, message],
+        //   });
+        // }
+
+        console.log(conversations);
+        console.log(message);
+
+        if (conversations) {
+          const updatedConversations = conversations.map((conversation) => {
+            const sender = conversation.participants.find(
+              (user) => user._id === message.sender._id
+            );
+
+            console.log(sender);
+
+            return !sender
+              ? conversation
+              : {
+                  ...conversation,
+                  messages: [...conversation.messages, message],
+                };
+          });
+          setConversations(updatedConversations);
+        }
+      });
+      return () => {
+        socket.off("newMessage");
+      };
+    }
+  }, [
+    socket,
+    setSelectedConversation,
+    selectedConversation,
+    conversations,
+    setConversations,
+  ]);
 
   if (!currentUser || currentUser === "loading") return null;
 
@@ -65,6 +111,8 @@ const Chat = ({
       toast.error(error.response.data.message);
     }
   };
+
+  console.log(selectedConversation);
 
   return (
     <div className="p-4 flex flex-col justify-between h-full">

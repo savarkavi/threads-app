@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuthContext } from "@/context/auth-provider";
 import { useConversationsContext } from "@/context/conversations-provider";
+import { useSocketContext } from "@/context/socket-provider";
 import { UserDataType } from "@/utils/types";
 import { CiSearch } from "react-icons/ci";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
@@ -37,6 +38,7 @@ const ChatSidebar = ({
 }) => {
   const { conversations } = useConversationsContext();
   const { currentUser } = useAuthContext();
+  const { onlineUsers } = useSocketContext();
 
   if (!currentUser || currentUser === "loading") return null;
 
@@ -76,22 +78,29 @@ const ChatSidebar = ({
                   selectedConversation?._id === conversation._id &&
                   "bg-zinc-800 rounded-lg"
                 } flex items-center gap-4 hover:bg-zinc-800 hover:rounded-lg py-2 cursor-pointer border-b transition-all`}
-                onClick={() => setSelectedConversation(conversation)}
+                onClick={() => {
+                  setSelectedConversation(conversation);
+                  setIsChatSidebarOpen(false);
+                }}
               >
                 <img
                   src={
                     reciever?.profilePic ? reciever?.profilePic : "/profile.png"
                   }
                   alt="profile pic"
-                  className="w-16 h-16 rounded-full"
+                  className="w-16 h-16 rounded-full object-cover"
                 />
                 <div className="flex flex-col gap-2">
-                  <h2 className="font-semibold">{reciever?.username}</h2>
+                  <div className="flex gap-2 items-center">
+                    <h2 className="font-semibold">{reciever?.username}</h2>
+                    {onlineUsers.find((userId) => userId === reciever?._id) && (
+                      <span className="text-sm text-green-500">online</span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-400">
-                    {
-                      conversation.messages[conversation.messages.length - 1]
-                        .message
-                    }
+                    {conversation.messages[
+                      conversation.messages.length - 1
+                    ].message.substring(0, 18) + "..."}
                   </p>
                 </div>
               </div>

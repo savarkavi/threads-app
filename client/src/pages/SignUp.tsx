@@ -3,6 +3,7 @@ import { useAuthContext } from "@/context/auth-provider";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { RotatingLines } from "react-loader-spinner";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 type FormData = {
@@ -19,6 +20,8 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+
   const { currentUser } = useAuthContext();
   const navigate = useNavigate();
 
@@ -28,6 +31,7 @@ const SignUp = () => {
 
   const handleFormSubmission = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     const { fullname, username, email, password } = inputs;
 
@@ -46,6 +50,7 @@ const SignUp = () => {
 
       toast.success("Account successfully created.");
       navigate("/auth/signin");
+      setLoading(false);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -122,7 +127,20 @@ const SignUp = () => {
             />
           </div>
 
-          <button className="p-3 rounded-lg bg-blue-500 mt-4">Sign Up</button>
+          <button className="p-3 rounded-lg bg-blue-500 mt-4 flex justify-center items-center">
+            {loading ? (
+              <RotatingLines
+                visible={true}
+                width="20"
+                strokeWidth="5"
+                strokeColor="white"
+                animationDuration="0.75"
+                ariaLabel="rotating-lines-loading"
+              />
+            ) : (
+              "Signup"
+            )}
+          </button>
           <div className="mt-4 flex gap-2 self-center">
             <p>Already a user?</p>
             <Link to="/auth/signin" className="text-blue-500">

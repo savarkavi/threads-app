@@ -7,6 +7,7 @@ import { ThemeProvider } from "./context/theme-provider";
 import { Toaster } from "react-hot-toast";
 import { AuthContextProvider } from "./context/auth-provider.tsx";
 import { ConversationsContextProvider } from "./context/conversations-provider.tsx";
+import { SocketContextProvider } from "./context/socket-provider.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <AuthContextProvider>
           <ConversationsContextProvider>
-            <App />
+            <SocketContextProvider>
+              <App />
+            </SocketContextProvider>
           </ConversationsContextProvider>
         </AuthContextProvider>
       </ThemeProvider>
