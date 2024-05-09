@@ -6,6 +6,7 @@ import { PostDataType } from "@/utils/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { RotatingLines } from "react-loader-spinner";
 import { Navigate } from "react-router-dom";
 
 const HomePage = () => {
@@ -53,7 +54,18 @@ const HomePage = () => {
   }
 
   if (!latestPostsData) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex justify-center mt-20">
+        <RotatingLines
+          visible={true}
+          width="50"
+          strokeWidth="5"
+          strokeColor="white"
+          animationDuration="0.75"
+          ariaLabel="rotating-lines-loading"
+        />
+      </div>
+    );
   }
 
   return (

@@ -40,11 +40,22 @@ export const sendMessage = async (req, res) => {
       existingConversation.messages.push(savedMessage._id);
       await existingConversation.save();
     } else {
-      const savedConversation = await new Conversation({
+      await new Conversation({
         participants: [senderId, recieverId],
         messages: [savedMessage._id],
       }).save();
     }
+
+    const newConversation = await Conversation.findOne({
+      participants: { $all: [senderId, recieverId] },
+    })
+      .populate({ path: "participants", select: "-password -__v" })
+      .populate({
+        path: "messages",
+        select: "-__v",
+        populate: { path: "sender", select: "-password -__v" },
+      })
+      .select("-__v");
 
     const newMessage = await Message.findById(savedMessage._id)
       .select("-__v")
@@ -55,7 +66,9 @@ export const sendMessage = async (req, res) => {
 
     io.to(recieverSocketId).emit("newMessage", newMessage);
 
-    res.status(201).json({ message: "message sent", newMessage });
+    res
+      .status(201)
+      .json({ message: "message sent", newMessage, newConversation });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Something went wrong" });

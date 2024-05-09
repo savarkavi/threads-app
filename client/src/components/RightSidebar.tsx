@@ -3,6 +3,7 @@ import { UserDataType } from "@/utils/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { RotatingLines } from "react-loader-spinner";
 import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
@@ -25,11 +26,22 @@ const RightSidebar = () => {
   }, []);
 
   if (!suggestedUsers) {
-    return <div>Loading...</div>;
+    return (
+      <div className="hidden h-[500px] w-[350px] p-8 xl:flex justify-center items-center">
+        <RotatingLines
+          visible={true}
+          width="50"
+          strokeWidth="5"
+          strokeColor="white"
+          animationDuration="0.75"
+          ariaLabel="rotating-lines-loading"
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="hidden xl:block h-[500px] p-8">
+    <div className="hidden w-[350px] xl:block h-[500px] p-8">
       <h2 className="text-2xl">Suggested Users</h2>
       {suggestedUsers.length === 0 && (
         <div className="mt-8">You are following everybody!</div>
@@ -49,7 +61,7 @@ const RightSidebar = () => {
               </div>
               <Link
                 to={`/${user.username}`}
-                className="py-2 px-3 rounded-lg bg-blue-600 text-sm"
+                className="py-2 px-4 rounded-lg text-white bg-blue-600 text-sm"
               >
                 View
               </Link>

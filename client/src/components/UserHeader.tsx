@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "@/context/auth-provider";
+import { useConversationsContext } from "@/context/conversations-provider";
 
 const UserHeader = ({
   userData,
@@ -38,6 +39,7 @@ const UserHeader = ({
   const [inputMessage, setInputMessage] = useState("");
 
   const { currentUser } = useAuthContext();
+  const { conversations, setConversations } = useConversationsContext();
 
   useEffect(() => {
     if (currentUser && currentUser !== "loading") {
@@ -139,10 +141,13 @@ const UserHeader = ({
     setLoading(true);
 
     try {
-      await axios.post(`/api/messages/send/${userData._id}`, {
+      const { data } = await axios.post(`/api/messages/send/${userData._id}`, {
         message: inputMessage,
       });
 
+      if (conversations) {
+        setConversations([...conversations, data.newConversation]);
+      }
       setInputMessage("");
       toast.success("Message sent");
       setLoading(false);
@@ -163,7 +168,7 @@ const UserHeader = ({
           {userData.username !== currentUser.username && (
             <div className="flex items-center gap-4">
               <button
-                className="py-2 px-6 w-[100px] text-sm rounded-lg bg-blue-600 flex justify-center items-center"
+                className="py-2 px-6 w-[100px] text-sm rounded-lg text-white bg-blue-600 flex justify-center items-center"
                 onClick={handleFollowUser}
                 disabled={loading}
               >
@@ -184,7 +189,7 @@ const UserHeader = ({
               </button>
               <Dialog>
                 <DialogTrigger>
-                  <button className="py-2 px-6 w-[100px] text-sm rounded-lg bg-blue-600 flex justify-center items-center">
+                  <button className="py-2 px-6 w-[100px] text-sm rounded-lg text-white bg-blue-600 flex justify-center items-center">
                     Message
                   </button>
                 </DialogTrigger>

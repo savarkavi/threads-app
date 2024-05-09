@@ -8,14 +8,21 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useConversationsContext } from "@/context/conversations-provider";
 import { useSocketContext } from "@/context/socket-provider";
+import { IsMessageRead } from "@/App";
 
 const Chat = ({
   selectedConversation,
   setSelectedConversation,
+  isMessageRead,
+  setIsMessageRead,
 }: {
   selectedConversation: ConversationType | null;
   setSelectedConversation: React.Dispatch<
     React.SetStateAction<ConversationType | null>
+  >;
+  isMessageRead: IsMessageRead[] | null;
+  setIsMessageRead: React.Dispatch<
+    React.SetStateAction<IsMessageRead[] | null>
   >;
 }) => {
   const [inputMessage, setInputMessage] = useState("");
@@ -34,23 +41,11 @@ const Chat = ({
   useEffect(() => {
     if (socket) {
       socket.on("newMessage", (message) => {
-        // if (selectedConversation) {
-        //   setSelectedConversation({
-        //     ...selectedConversation,
-        //     messages: [...selectedConversation.messages, message],
-        //   });
-        // }
-
-        console.log(conversations);
-        console.log(message);
-
         if (conversations) {
           const updatedConversations = conversations.map((conversation) => {
             const sender = conversation.participants.find(
               (user) => user._id === message.sender._id
             );
-
-            console.log(sender);
 
             return !sender
               ? conversation
@@ -154,10 +149,18 @@ const Chat = ({
                         {format(message.createdAt, "HH:mm")}
                       </time>
                     </div>
-                    <div className="chat-bubble bg-zinc-800">
+                    <div
+                      className={`chat-bubble ${
+                        message.sender._id === currentUser.id
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-300 text-black dark:text-white dark:bg-zinc-800"
+                      }`}
+                    >
                       {message.message}
                     </div>
-                    <div className="chat-footer opacity-50">Delivered</div>
+                    {message.sender._id === currentUser.id && (
+                      <div className="chat-footer opacity-50">Delivered</div>
+                    )}
                   </div>
                 </div>
               );

@@ -34,7 +34,7 @@ const LeftSidebar = () => {
 
   return (
     <div className="hidden fixed dark:bg-black w-[300px] h-screen border xl:flex flex-col gap-20 shadow-lg text-center p-8">
-      <h1 className="text-3xl uppercase">Social</h1>
+      <h1 className="text-3xl uppercase font-semibold">Social</h1>
       <div className="flex flex-col items-start gap-16">
         <div className="flex gap-3 items-center text-xl cursor-pointer hover:text-blue-600 transition-all">
           <IoMdHome />

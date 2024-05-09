@@ -13,6 +13,11 @@ import Chat from "./pages/Chat";
 import ChatSidebar, { ConversationType } from "./components/ChatSidebar";
 import { useState } from "react";
 
+export type IsMessageRead = {
+  userId: string;
+  isRead: boolean;
+};
+
 function App() {
   const { theme } = useTheme();
   const { pathname } = useLocation();
@@ -20,6 +25,10 @@ function App() {
   const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(true);
   const [selectedConversation, setSelectedConversation] =
     useState<ConversationType | null>(null);
+
+  const [isMessageRead, setIsMessageRead] = useState<IsMessageRead[] | null>(
+    null
+  );
 
   return (
     <div
@@ -37,6 +46,8 @@ function App() {
           setIsChatSidebarOpen={setIsChatSidebarOpen}
           selectedConversation={selectedConversation}
           setSelectedConversation={setSelectedConversation}
+          isMessageRead={isMessageRead}
+          setIsMessageRead={setIsMessageRead}
         />
       )}
       <div
@@ -69,6 +80,8 @@ function App() {
                 <Chat
                   selectedConversation={selectedConversation}
                   setSelectedConversation={setSelectedConversation}
+                  isMessageRead={isMessageRead}
+                  setIsMessageRead={setIsMessageRead}
                 />
               }
             />

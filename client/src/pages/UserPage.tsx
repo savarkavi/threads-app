@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Navigate, useParams } from "react-router-dom";
 import { PostDataType, UserDataType } from "@/utils/types";
+import { RotatingLines } from "react-loader-spinner";
 
 const UserPage = () => {
   const { username } = useParams();
@@ -46,7 +47,18 @@ const UserPage = () => {
   }
 
   if (!userData || !userPosts) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex justify-center mt-20">
+        <RotatingLines
+          visible={true}
+          width="50"
+          strokeWidth="5"
+          strokeColor="white"
+          animationDuration="0.75"
+          ariaLabel="rotating-lines-loading"
+        />
+      </div>
+    );
   }
 
   return (

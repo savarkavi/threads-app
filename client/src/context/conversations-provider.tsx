@@ -3,6 +3,7 @@ import { ConversationType } from "@/components/ChatSidebar";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useAuthContext } from "./auth-provider";
 
 type ContextTypes = {
   conversations: ConversationType[] | null;
@@ -31,19 +32,25 @@ export const ConversationsContextProvider = ({
     null
   );
 
-  useEffect(() => {
-    try {
-      const fetchConversationUsers = async () => {
-        const { data } = await axios.get("/api/user/getConversationUsers");
-        setConversations(data);
-      };
+  const { currentUser } = useAuthContext();
 
-      fetchConversationUsers();
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
+  useEffect(() => {
+    if (currentUser) {
+      try {
+        const fetchConversationUsers = async () => {
+          const { data } = await axios.get("/api/user/getConversationUsers");
+          setConversations(data);
+        };
+
+        fetchConversationUsers();
+      } catch (error: any) {
+        console.log(error);
+        toast.error(error.response.data.message);
+      }
     }
-  }, []);
+  }, [currentUser]);
+
+  console.log(conversations);
 
   return (
     <ConversationsContext.Provider value={{ conversations, setConversations }}>

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { IsMessageRead } from "@/App";
 import { useAuthContext } from "@/context/auth-provider";
 import { useConversationsContext } from "@/context/conversations-provider";
 import { useSocketContext } from "@/context/socket-provider";
@@ -28,12 +29,18 @@ const ChatSidebar = ({
   setIsChatSidebarOpen,
   selectedConversation,
   setSelectedConversation,
+  isMessageRead,
+  setIsMessageRead,
 }: {
   isChatSidebarOpen: boolean;
   setIsChatSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedConversation: ConversationType | null;
   setSelectedConversation: React.Dispatch<
     React.SetStateAction<ConversationType | null>
+  >;
+  isMessageRead: IsMessageRead[] | null;
+  setIsMessageRead: React.Dispatch<
+    React.SetStateAction<IsMessageRead[] | null>
   >;
 }) => {
   const { conversations } = useConversationsContext();
@@ -42,7 +49,7 @@ const ChatSidebar = ({
 
   if (!currentUser || currentUser === "loading") return null;
 
-  if (!conversations) return null;
+  console.log(conversations);
 
   return (
     <div
@@ -66,47 +73,57 @@ const ChatSidebar = ({
           </div>
         </form>
         <hr />
-        <div className="flex flex-col gap-4">
-          {conversations.map((conversation: ConversationType) => {
-            const reciever = conversation.participants.find(
-              (user) => user._id !== currentUser.id
-            );
-            return (
-              <div
-                key={conversation._id}
-                className={`${
-                  selectedConversation?._id === conversation._id &&
-                  "bg-zinc-800 rounded-lg"
-                } flex items-center gap-4 hover:bg-zinc-800 hover:rounded-lg py-2 cursor-pointer border-b transition-all`}
-                onClick={() => {
-                  setSelectedConversation(conversation);
-                  setIsChatSidebarOpen(false);
-                }}
-              >
-                <img
-                  src={
-                    reciever?.profilePic ? reciever?.profilePic : "/profile.png"
-                  }
-                  alt="profile pic"
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-2 items-center">
-                    <h2 className="font-semibold">{reciever?.username}</h2>
-                    {onlineUsers.find((userId) => userId === reciever?._id) && (
-                      <span className="text-sm text-green-500">online</span>
-                    )}
+        {!conversations ? (
+          <div>laoding...</div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {conversations.map((conversation: ConversationType) => {
+              const lastMessage =
+                conversation.messages[conversation.messages.length - 1].message;
+              const reciever = conversation.participants.find(
+                (user) => user._id !== currentUser.id
+              );
+              return (
+                <div
+                  key={conversation._id}
+                  className={`${
+                    selectedConversation?._id === conversation._id &&
+                    "bg-gray-300 dark:bg-zinc-800 rounded-lg"
+                  } flex items-center gap-4 hover:bg-gray-300 dark:hover:bg-zinc-800 hover:rounded-lg py-2 cursor-pointer border-b transition-all`}
+                  onClick={() => {
+                    setSelectedConversation(conversation);
+                    setIsChatSidebarOpen(false);
+                  }}
+                >
+                  <img
+                    src={
+                      reciever?.profilePic
+                        ? reciever?.profilePic
+                        : "/profile.png"
+                    }
+                    alt="profile pic"
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2 items-center">
+                      <h2 className="font-semibold">{reciever?.username}</h2>
+                      {onlineUsers.find(
+                        (userId) => userId === reciever?._id
+                      ) && (
+                        <span className="text-sm w-2 h-2 rounded-full bg-green-500"></span>
+                      )}
+                    </div>
+                    <p className="text-sm dark:text-gray-400">
+                      {lastMessage.length < 18
+                        ? lastMessage
+                        : lastMessage.substring(0, 18) + "..."}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-400">
-                    {conversation.messages[
-                      conversation.messages.length - 1
-                    ].message.substring(0, 18) + "..."}
-                  </p>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
