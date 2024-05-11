@@ -75,7 +75,9 @@ const UserProfile = () => {
         <UpdateProfileForm />
       </Dialog>
       {!pathname.includes("/chat") && (
-        <IoChatbubbleEllipsesSharp className="text-2xl sm:text-3xl" />
+        <Link to={"/chat"}>
+          <IoChatbubbleEllipsesSharp className="xl:hidden text-2xl sm:text-3xl" />
+        </Link>
       )}
     </div>
   );

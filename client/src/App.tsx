@@ -26,10 +26,6 @@ function App() {
   const [selectedConversation, setSelectedConversation] =
     useState<ConversationType | null>(null);
 
-  const [isMessageRead, setIsMessageRead] = useState<IsMessageRead[] | null>(
-    null
-  );
-
   return (
     <div
       className={`w-full min-h-screen ${
@@ -46,8 +42,6 @@ function App() {
           setIsChatSidebarOpen={setIsChatSidebarOpen}
           selectedConversation={selectedConversation}
           setSelectedConversation={setSelectedConversation}
-          isMessageRead={isMessageRead}
-          setIsMessageRead={setIsMessageRead}
         />
       )}
       <div
@@ -80,8 +74,6 @@ function App() {
                 <Chat
                   selectedConversation={selectedConversation}
                   setSelectedConversation={setSelectedConversation}
-                  isMessageRead={isMessageRead}
-                  setIsMessageRead={setIsMessageRead}
                 />
               }
             />

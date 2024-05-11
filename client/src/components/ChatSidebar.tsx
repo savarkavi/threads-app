@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IsMessageRead } from "@/App";
 import { useAuthContext } from "@/context/auth-provider";
 import { useConversationsContext } from "@/context/conversations-provider";
 import { useSocketContext } from "@/context/socket-provider";
 import { UserDataType } from "@/utils/types";
 import { CiSearch } from "react-icons/ci";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
+import { RotatingLines } from "react-loader-spinner";
 
 export type MessageType = {
   _id: string;
@@ -14,6 +14,7 @@ export type MessageType = {
   reciever: UserDataType;
   sender: UserDataType;
   message: string;
+  isSeen: boolean;
 };
 
 export type ConversationType = {
@@ -29,8 +30,6 @@ const ChatSidebar = ({
   setIsChatSidebarOpen,
   selectedConversation,
   setSelectedConversation,
-  isMessageRead,
-  setIsMessageRead,
 }: {
   isChatSidebarOpen: boolean;
   setIsChatSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,18 +37,12 @@ const ChatSidebar = ({
   setSelectedConversation: React.Dispatch<
     React.SetStateAction<ConversationType | null>
   >;
-  isMessageRead: IsMessageRead[] | null;
-  setIsMessageRead: React.Dispatch<
-    React.SetStateAction<IsMessageRead[] | null>
-  >;
 }) => {
   const { conversations } = useConversationsContext();
   const { currentUser } = useAuthContext();
   const { onlineUsers } = useSocketContext();
 
   if (!currentUser || currentUser === "loading") return null;
-
-  console.log(conversations);
 
   return (
     <div
@@ -74,7 +67,21 @@ const ChatSidebar = ({
         </form>
         <hr />
         {!conversations ? (
-          <div>laoding...</div>
+          <div className="flex justify-center mt-16">
+            {" "}
+            <RotatingLines
+              visible={true}
+              width="50"
+              strokeWidth="5"
+              strokeColor="white"
+              animationDuration="0.75"
+              ariaLabel="rotating-lines-loading"
+            />
+          </div>
+        ) : conversations.length === 0 ? (
+          <div className="flex justify-center mt-16 text-xl">
+            You have no conversations
+          </div>
         ) : (
           <div className="flex flex-col gap-4">
             {conversations.map((conversation: ConversationType) => {
@@ -89,7 +96,7 @@ const ChatSidebar = ({
                   className={`${
                     selectedConversation?._id === conversation._id &&
                     "bg-gray-300 dark:bg-zinc-800 rounded-lg"
-                  } flex items-center gap-4 hover:bg-gray-300 dark:hover:bg-zinc-800 hover:rounded-lg py-2 cursor-pointer border-b transition-all`}
+                  } flex items-center gap-4 hover:bg-gray-300 dark:hover:bg-zinc-800 hover:rounded-lg p-2 cursor-pointer border-b transition-all`}
                   onClick={() => {
                     setSelectedConversation(conversation);
                     setIsChatSidebarOpen(false);
@@ -113,10 +120,31 @@ const ChatSidebar = ({
                         <span className="text-sm w-2 h-2 rounded-full bg-green-500"></span>
                       )}
                     </div>
-                    <p className="text-sm dark:text-gray-400">
+                    <p
+                      className={`text-sm dark:text-gray-400 flex items-center gap-4 justify-between`}
+                    >
                       {lastMessage.length < 18
                         ? lastMessage
                         : lastMessage.substring(0, 18) + "..."}
+                      {conversation.messages[conversation.messages.length - 1]
+                        .sender._id !== currentUser.id && (
+                        <span
+                          className={`${
+                            selectedConversation?._id === conversation._id ||
+                            conversation.messages.filter(
+                              (message) => !message.isSeen
+                            ).length === 0
+                              ? "hidden"
+                              : ""
+                          } w-2 h-2 rounded-full text-[12px] bg-red-500 p-3 flex justify-center items-center text-white`}
+                        >
+                          {
+                            conversation.messages.filter(
+                              (message) => !message.isSeen
+                            ).length
+                          }
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>

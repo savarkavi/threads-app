@@ -8,21 +8,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useConversationsContext } from "@/context/conversations-provider";
 import { useSocketContext } from "@/context/socket-provider";
-import { IsMessageRead } from "@/App";
 
 const Chat = ({
   selectedConversation,
   setSelectedConversation,
-  isMessageRead,
-  setIsMessageRead,
 }: {
   selectedConversation: ConversationType | null;
   setSelectedConversation: React.Dispatch<
     React.SetStateAction<ConversationType | null>
-  >;
-  isMessageRead: IsMessageRead[] | null;
-  setIsMessageRead: React.Dispatch<
-    React.SetStateAction<IsMessageRead[] | null>
   >;
 }) => {
   const [inputMessage, setInputMessage] = useState("");
@@ -56,7 +49,14 @@ const Chat = ({
           });
           setConversations(updatedConversations);
         }
+        if (selectedConversation) {
+          setSelectedConversation({
+            ...selectedConversation,
+            messages: [...selectedConversation.messages, message],
+          });
+        }
       });
+
       return () => {
         socket.off("newMessage");
       };
@@ -68,6 +68,40 @@ const Chat = ({
     conversations,
     setConversations,
   ]);
+
+  useEffect(() => {
+    if (!currentUser || currentUser == "loading") return;
+
+    if (
+      selectedConversation &&
+      selectedConversation.messages[selectedConversation.messages.length - 1]
+        .sender._id !== currentUser.id
+    ) {
+      const user = selectedConversation.participants.find(
+        (user) => user._id !== currentUser.id
+      );
+
+      socket?.emit("markMessagesAsSeen", {
+        conversationId: selectedConversation._id,
+        userId: user?._id,
+      });
+    }
+
+    if (selectedConversation) {
+      socket?.on("messageSeen", ({ conversationId }) => {
+        if (selectedConversation?._id === conversationId) {
+          const updatedMessages = selectedConversation.messages.map((message) =>
+            message.isSeen ? message : { ...message, isSeen: true }
+          );
+
+          setSelectedConversation({
+            ...selectedConversation,
+            messages: updatedMessages,
+          });
+        }
+      });
+    }
+  }, [socket, currentUser, selectedConversation, setSelectedConversation]);
 
   if (!currentUser || currentUser === "loading") return null;
 
@@ -81,6 +115,7 @@ const Chat = ({
       const { data } = await axios.post(`/api/messages/send/${reciever?._id}`, {
         message: inputMessage,
       });
+
       if (selectedConversation) {
         setSelectedConversation({
           ...selectedConversation,
@@ -100,14 +135,14 @@ const Chat = ({
         setConversations(updatedConversations);
       }
 
+      console.log(selectedConversation);
+
       setInputMessage("");
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
-
-  console.log(selectedConversation);
 
   return (
     <div className="p-4 flex flex-col justify-between h-full">
@@ -159,7 +194,9 @@ const Chat = ({
                       {message.message}
                     </div>
                     {message.sender._id === currentUser.id && (
-                      <div className="chat-footer opacity-50">Delivered</div>
+                      <div className="chat-footer opacity-50">
+                        {message.isSeen ? "seen" : "Delivered"}
+                      </div>
                     )}
                   </div>
                 </div>

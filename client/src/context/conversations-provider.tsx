@@ -50,8 +50,6 @@ export const ConversationsContextProvider = ({
     }
   }, [currentUser]);
 
-  console.log(conversations);
-
   return (
     <ConversationsContext.Provider value={{ conversations, setConversations }}>
       {children}

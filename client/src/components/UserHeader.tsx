@@ -34,7 +34,9 @@ const UserHeader = ({
   setUserPosts: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
 }) => {
   const [isFollowed, setIsFollowed] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [messageLoading, setMessageLoading] = useState(false);
+
   const [isPostsActive, setIsPostsActive] = useState<boolean>(true);
   const [inputMessage, setInputMessage] = useState("");
 
@@ -67,7 +69,7 @@ const UserHeader = ({
 
   const handleFollowUser = async () => {
     try {
-      setLoading(true);
+      setFollowLoading(true);
       await axios.post(`/api/user/followUser/${userData._id}`);
       setIsFollowed((prev) => !prev);
 
@@ -84,13 +86,14 @@ const UserHeader = ({
           });
         }
       }
-      setLoading(false);
+      setFollowLoading(false);
       toast.success(
         !isFollowed
           ? `Followed ${userData.username}`
           : `Unfollowed ${userData.username}`
       );
     } catch (error: any) {
+      setFollowLoading(false);
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -138,7 +141,7 @@ const UserHeader = ({
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setMessageLoading(true);
 
     try {
       const { data } = await axios.post(`/api/messages/send/${userData._id}`, {
@@ -150,10 +153,11 @@ const UserHeader = ({
       }
       setInputMessage("");
       toast.success("Message sent");
-      setLoading(false);
+      setMessageLoading(false);
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
+      setMessageLoading(false);
     }
   };
 
@@ -170,9 +174,9 @@ const UserHeader = ({
               <button
                 className="py-2 px-6 w-[100px] text-sm rounded-lg text-white bg-blue-600 flex justify-center items-center"
                 onClick={handleFollowUser}
-                disabled={loading}
+                disabled={followLoading}
               >
-                {loading ? (
+                {followLoading ? (
                   <RotatingLines
                     visible={true}
                     width="20"
@@ -210,7 +214,7 @@ const UserHeader = ({
                       onChange={(e) => setInputMessage(e.target.value)}
                     />
                     <button className="py-2 px-6 w-[100px] text-sm rounded-lg bg-green-500 flex justify-center items-center">
-                      {loading ? (
+                      {messageLoading ? (
                         <RotatingLines
                           visible={true}
                           width="20"

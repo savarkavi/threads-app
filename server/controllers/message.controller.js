@@ -26,24 +26,37 @@ export const sendMessage = async (req, res) => {
     const senderId = req.user._id;
     const { message } = req.body;
 
-    const savedMessage = await new Message({
-      sender: senderId,
-      reciever: recieverId,
-      message,
-    }).save();
+    let saveMessage;
+    let saveConversation;
 
     let existingConversation = await Conversation.findOne({
       participants: { $all: [senderId, recieverId] },
     });
 
     if (existingConversation) {
-      existingConversation.messages.push(savedMessage._id);
+      saveMessage = await new Message({
+        conversationId: existingConversation._id,
+        sender: senderId,
+        reciever: recieverId,
+        message,
+      }).save();
+
+      existingConversation.messages.push(saveMessage._id);
       await existingConversation.save();
     } else {
-      await new Conversation({
+      saveConversation = new Conversation({
         participants: [senderId, recieverId],
-        messages: [savedMessage._id],
+      });
+
+      saveMessage = await new Message({
+        conversationId: saveConversation._id,
+        sender: senderId,
+        reciever: recieverId,
+        message,
       }).save();
+
+      saveConversation.messages.push(saveMessage._id);
+      await saveConversation.save();
     }
 
     const newConversation = await Conversation.findOne({
@@ -57,7 +70,7 @@ export const sendMessage = async (req, res) => {
       })
       .select("-__v");
 
-    const newMessage = await Message.findById(savedMessage._id)
+    const newMessage = await Message.findById(saveMessage._id)
       .select("-__v")
       .populate({ path: "sender", select: "-password -__v" })
       .populate({ path: "reciever", select: "-password -__v" });
