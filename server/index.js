@@ -8,6 +8,7 @@ import postRoutes from "./routes/post.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { v2 as cloudinary } from "cloudinary";
 import { app, server } from "./socket/socket.js";
+import cors from "cors";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
