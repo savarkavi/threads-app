@@ -28,7 +28,7 @@ export const SocketContextProvider = ({
   const { currentUser } = useAuthContext();
 
   useEffect(() => {
-    const socket = io("http://localhost:5000", {
+    const socket = io("https://threads-app-uhbt.onrender.com/", {
       query: {
         userId: currentUser !== "loading" && currentUser?.id,
       },
