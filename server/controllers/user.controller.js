@@ -99,12 +99,8 @@ export const getPopularUsers = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const users = await User.find({
-      followers: { $nin: userId },
-      _id: { $ne: userId },
-    })
+    const users = await User.find()
       .sort({ "followers.length": -1 })
-      .limit(5)
       .select("-password -__v");
 
     res.status(200).json(users);

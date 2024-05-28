@@ -135,8 +135,6 @@ const Chat = ({
         setConversations(updatedConversations);
       }
 
-      console.log(selectedConversation);
-
       setInputMessage("");
     } catch (error: any) {
       console.log(error);

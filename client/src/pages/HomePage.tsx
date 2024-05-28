@@ -124,7 +124,7 @@ const HomePage = () => {
         <div>
           {followingPostsData?.length === 0 ? (
             <div className="flex justify-center mt-16 text-xl">
-              You are not following anyone
+              No posts available
             </div>
           ) : (
             followingPostsData?.map((post: PostDataType) => {
