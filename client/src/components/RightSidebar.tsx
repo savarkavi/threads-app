@@ -41,7 +41,7 @@ const RightSidebar = () => {
   }
 
   return (
-    <div className="hidden w-[350px] xl:block h-[500px] p-8 overflow-y-scroll">
+    <div className="hidden w-[350px] xl:block h-[500px] p-8 overflow-y-scroll hideScrollbar">
       <h2 className="text-2xl">Suggested Users</h2>
       {suggestedUsers.length === 0 && (
         <div className="mt-8">You are following everybody!</div>
