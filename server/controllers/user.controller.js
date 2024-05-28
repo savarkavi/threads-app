@@ -37,7 +37,7 @@ export const followUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { fullname, username, bio } = req.body;
+    const { fullname, username, bio, profilePic } = req.body;
     const imagePath = req.file?.path;
     let imageUrl = "";
 
@@ -58,7 +58,7 @@ export const updateUser = async (req, res) => {
 
     user.fullname = fullname || user.fullname;
     user.username = username || user.username;
-    user.profilePic = imageUrl ? imageUrl : "";
+    user.profilePic = imageUrl ? imageUrl : profilePic ? profilePic : "";
     user.bio = bio || user.bio;
 
     const updatedUser = await user.save();

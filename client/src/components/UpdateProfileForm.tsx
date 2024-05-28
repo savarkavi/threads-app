@@ -38,6 +38,10 @@ const UpdateProfileForm = () => {
         formData.append("file", imageFile);
       }
 
+      if (!imageFile && currentUser.profilePic) {
+        formData.append("profilePic", currentUser.profilePic);
+      }
+
       const { data } = await axios.post(
         `/api/user/updateUser/${currentUser.id}`,
         formData,

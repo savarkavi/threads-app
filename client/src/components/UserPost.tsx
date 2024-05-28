@@ -11,7 +11,7 @@ const UserPost = ({
   setPostsData: React.Dispatch<React.SetStateAction<PostDataType[] | null>>;
 }) => {
   return (
-    <div className="flex gap-4 sm:gap-8 w-full p-6 border-b border-gray-400 bg-white dark:bg-zinc-950">
+    <div className="flex gap-4 sm:gap-8 w-full px-6 py-10 border-b border-gray-400 bg-white dark:bg-zinc-950">
       <div className="flex flex-col justify-between flex-shrink-0">
         <div className="flex flex-col items-center h-full self-start">
           <img

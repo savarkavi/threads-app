@@ -53,7 +53,22 @@ const HomePage = () => {
     return <Navigate to="/auth/signin" />;
   }
 
-  if (!latestPostsData) {
+  if (isLatestPost && !latestPostsData) {
+    return (
+      <div className="min-h-screen flex justify-center mt-20">
+        <RotatingLines
+          visible={true}
+          width="50"
+          strokeWidth="5"
+          strokeColor="white"
+          animationDuration="0.75"
+          ariaLabel="rotating-lines-loading"
+        />
+      </div>
+    );
+  }
+
+  if (!isLatestPost && !followingPostsData) {
     return (
       <div className="min-h-screen flex justify-center mt-20">
         <RotatingLines
@@ -94,7 +109,7 @@ const HomePage = () => {
       </div>
       {isLatestPost ? (
         <div>
-          {latestPostsData.map((post: PostDataType) => {
+          {latestPostsData?.map((post: PostDataType) => {
             return (
               <UserPost
                 key={post._id}

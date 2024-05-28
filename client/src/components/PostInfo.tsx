@@ -108,7 +108,8 @@ const PostInfo = ({
   return (
     <div
       className={`w-full flex flex-col gap-6 ${
-        (comment && "border-y border-gray-300 dark:border-gray-500 p-6") ||
+        (comment &&
+          "border-y border-gray-300 dark:border-gray-500 px-6 py-8") ||
         (postPage && "px-6 dark:bg-zinc-950 mt-20")
       }`}
     >
