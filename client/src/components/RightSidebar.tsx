@@ -41,12 +41,9 @@ const RightSidebar = () => {
   }
 
   return (
-    <div className="hidden w-[350px] xl:block h-[500px] p-8 overflow-y-scroll hideScrollbar">
+    <div className="hidden w-[350px] xl:block h-[600px] p-8">
       <h2 className="text-2xl">Suggested Users</h2>
-      {suggestedUsers.length === 0 && (
-        <div className="mt-8">You are following everybody!</div>
-      )}
-      <div className="mt-8 flex flex-col gap-8">
+      <div className="mt-8 flex flex-col gap-8 overflow-y-scroll hideScrollbar">
         {suggestedUsers.map((user: UserDataType) => {
           return (
             <div key={user._id} className="flex gap-8 w-full items-center">
