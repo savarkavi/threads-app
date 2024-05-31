@@ -4,7 +4,6 @@ import { CgProfile } from "react-icons/cg";
 import { CiLogout } from "react-icons/ci";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/context/auth-provider";
-import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import UpdateProfileForm from "./UpdateProfileForm";
@@ -53,10 +52,10 @@ const LeftSidebar = () => {
             <UpdateProfileForm />
           </Dialog>
         </div>
-        <div className="flex gap-3 items-center text-xl cursor-pointer hover:text-blue-600 transition-all">
+        {/* <div className="flex gap-3 items-center text-xl cursor-pointer hover:text-blue-600 transition-all">
           <IoChatbubbleEllipsesSharp />
           <Link to={"/chat"}>Messages</Link>
-        </div>
+        </div> */}
         <div
           className="flex gap-3 items-center text-xl cursor-pointer hover:text-blue-600 transition-all"
           onClick={handleLogout}

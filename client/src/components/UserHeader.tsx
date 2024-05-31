@@ -10,19 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "@/context/auth-provider";
-import { useConversationsContext } from "@/context/conversations-provider";
 
 const UserHeader = ({
   userData,
@@ -35,13 +26,10 @@ const UserHeader = ({
 }) => {
   const [isFollowed, setIsFollowed] = useState<boolean>(false);
   const [followLoading, setFollowLoading] = useState(false);
-  const [messageLoading, setMessageLoading] = useState(false);
 
   const [isPostsActive, setIsPostsActive] = useState<boolean>(true);
-  const [inputMessage, setInputMessage] = useState("");
 
   const { currentUser } = useAuthContext();
-  const { conversations, setConversations } = useConversationsContext();
 
   useEffect(() => {
     if (currentUser && currentUser !== "loading") {
@@ -139,28 +127,6 @@ const UserHeader = ({
     }
   };
 
-  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setMessageLoading(true);
-
-    try {
-      const { data } = await axios.post(`/api/messages/send/${userData._id}`, {
-        message: inputMessage,
-      });
-
-      if (conversations) {
-        setConversations([...conversations, data.newConversation]);
-      }
-      setInputMessage("");
-      toast.success("Message sent");
-      setMessageLoading(false);
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.response.data.message);
-      setMessageLoading(false);
-    }
-  };
-
   return (
     <div className="flex flex-col gap-8 p-6">
       <div className="flex justify-between mt-20">
@@ -191,45 +157,6 @@ const UserHeader = ({
                   "follow"
                 )}
               </button>
-              <Dialog>
-                <DialogTrigger>
-                  <button className="py-2 px-6 w-[100px] text-sm rounded-lg text-white bg-blue-600 flex justify-center items-center">
-                    Message
-                  </button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="flex gap-2">
-                      <p>Send a message</p>
-                      <span className="capitalize">{userData.fullname}</span>
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form
-                    className="flex flex-col gap-4 items-end"
-                    onSubmit={handleSubmitForm}
-                  >
-                    <textarea
-                      className="border p-2 rounded-lg w-full bg-transparent h-28"
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                    />
-                    <button className="py-2 px-6 w-[100px] text-sm rounded-lg bg-green-500 flex justify-center items-center">
-                      {messageLoading ? (
-                        <RotatingLines
-                          visible={true}
-                          width="20"
-                          strokeWidth="5"
-                          strokeColor="white"
-                          animationDuration="0.75"
-                          ariaLabel="rotating-lines-loading"
-                        />
-                      ) : (
-                        "Send"
-                      )}
-                    </button>
-                  </form>
-                </DialogContent>
-              </Dialog>
             </div>
           )}
         </div>

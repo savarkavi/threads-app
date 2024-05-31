@@ -9,7 +9,6 @@ import SignIn from "./pages/SignIn";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
 import { useAuthContext } from "./context/auth-provider";
-import Chat from "./pages/Chat";
 import ChatSidebar, { ConversationType } from "./components/ChatSidebar";
 import { useState } from "react";
 
@@ -68,15 +67,6 @@ function App() {
             <Route path="/:username/post/:postId" element={<UserPostPage />} />
             <Route path="/auth/signup" element={<SignUp />} />
             <Route path="/auth/signin" element={<SignIn />} />
-            <Route
-              path="/chat"
-              element={
-                <Chat
-                  selectedConversation={selectedConversation}
-                  setSelectedConversation={setSelectedConversation}
-                />
-              }
-            />
           </Routes>
         </div>
         {currentUser === null ||
